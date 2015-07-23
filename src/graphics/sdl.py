@@ -30,11 +30,20 @@ class SdlGraphics(object):
             return False,
             'SDL_CreateRenderer failed: {}'.format(SDL_GetError())
 
-        SDL_SetRenderDrawColor(self.renderer, 0, 0, 0, 255)
-        SDL_RenderClear(self.renderer)
-        SDL_RenderPresent(self.renderer)
+        self.clear()
 
         return True, None
 
-    def render(self):
+    def clear(self):
+        SDL_SetRenderDrawColor(self.renderer, 0, 0, 0, 255)
+        SDL_RenderClear(self.renderer)
+
+    def render(self, state):
+        self.clear()
+
+        for actor in state.actors:
+            actor.render(self.renderer)
+
+        SDL_RenderPresent(self.renderer)
+
         SDL_Delay(16)

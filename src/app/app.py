@@ -1,6 +1,6 @@
 from ..engine.engine import Engine
 from ..graphics.sdl import SdlGraphics
-from ..input.sdl import SdlInput
+from ..events.sdl import SdlEvents
 from ..state.base import BaseGameState
 
 
@@ -13,12 +13,12 @@ class App(object):
     def __init__(self, *args, **kwargs):
         resolution = kwargs.pop('resolution', (1280, 790))
         graphics = kwargs.pop('graphics', SdlGraphics(resolution=resolution))
-        input = kwargs.pop('input', SdlInput())
+        events = kwargs.pop('events', SdlEvents())
         state = kwargs.pop('state', BaseGameState())
 
         self.engine = kwargs.pop('engine', Engine(state=state,
                                                   graphics=graphics,
-                                                  input=input,
+                                                  events=events,
                                                   *args, **kwargs))
 
     def run(self):

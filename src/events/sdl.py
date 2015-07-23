@@ -1,7 +1,7 @@
 from sdl2 import *
 
 
-class SdlInput(object):
+class SdlEvents(object):
 
     def __init__(self):
         self.signals = {}
@@ -28,9 +28,24 @@ class SdlInput(object):
     def nop(self, evt):
         pass
 
+    def trigger(self, evt, event_name):
+        for handler in self.signals.get(event_name, []):
+            handler(evt)
+
     def quit(self, evt):
         for handler in self.signals.get('quit', []):
             handler(evt)
 
+    def key(self, evt, sym):
+        letter = 'key:{}'.format(chr(sym))
+        for handler in self.signals.get(letter, []):
+            handler(evt)
+
     def keydown(self, evt):
-        evt = evt.key
+        keysym = evt.key.keysym
+
+        # temporarily quit based on standard-ish quit keys
+        if keysym.sym == SDLK_ESCAPE or keysym.sym == SDLK_q:
+            self.quit(evt)
+        else:
+            self.key(evt, keysym.sym)

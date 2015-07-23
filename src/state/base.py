@@ -1,7 +1,11 @@
 class BaseGameState(object):
 
+    def __init__(self):
+        self.actors = []
+
     def update(self):
-        pass
+        for a in self.actors:
+            a.update()
 
     def reset(self):
         return True, ''
