@@ -1,0 +1,2 @@
+class Bordered(object):
+    pass

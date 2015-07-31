@@ -1,5 +1,5 @@
 class Dimensions(object):
 
-    def __init__(self, w, h):
-        self.w = w
-        self.h = h
+    def __init__(self, width=0, height=0):
+        self.w = width
+        self.h = height

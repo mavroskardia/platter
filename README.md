@@ -1,2 +1,4 @@
 # platter
-Engine for making side-scrolling platformers
+
+Port of Randy Gaul's Impulse Engine [https://github.com/RandyGaul/ImpulseEngine]
+

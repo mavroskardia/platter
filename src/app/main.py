@@ -14,13 +14,9 @@ if __name__ == '__main__':
 
     from .app import App
 
-    print('Creating app...', end='')
+    print('Running app.')
 
-    app = App(resolution=(1280, 900))
-
-    print('done.\nRunning app.')
-
-    retcode = app.run()
+    retcode = App().run()
 
     print('App finished with exit code {}.'.format(retcode))
 
