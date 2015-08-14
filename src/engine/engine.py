@@ -1,3 +1,4 @@
+from collections import defaultdict
 from .signaler import Signaler
 from ..componentdb.componentdb import EntityComponentDb
 
@@ -5,7 +6,7 @@ from ..componentdb.componentdb import EntityComponentDb
 class Engine(object):
 
     def __init__(self):
-        self.systems = set()
+        self.systems = defaultdict()
         self.deferred = set()
         self.componentdb = EntityComponentDb()
         self.signaler = Signaler()
@@ -14,7 +15,9 @@ class Engine(object):
     def add_system(self, system):
         s = system()
         s.init(self.signaler)
-        self.systems.add(s)
+
+        if type(s) not in self.systems:
+            self.systems[type(s)] = s
 
     def run(self):
 
@@ -24,7 +27,7 @@ class Engine(object):
 
         while self.running:
             for s in self.systems:
-                s.update(self.signaler, self.componentdb)
+                self.systems[s].update(self.signaler, self.componentdb)
 
             for deferred in self.deferred:
                 deferred()
@@ -35,6 +38,8 @@ class Engine(object):
         self.running = False
 
     def debug(self):
+
+        self.componentdb.clear()
 
         def f():
             from .entity import Entity

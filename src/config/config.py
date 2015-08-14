@@ -1,4 +1,3 @@
-from itertools import chain
 from imp import importlib
 
 # Configuration Variables

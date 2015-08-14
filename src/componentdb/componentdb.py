@@ -12,6 +12,10 @@ class EntityComponentDb(object):
         self.components = defaultdict(set)
         self.entities = set()
 
+    def clear(self):
+        self.components.clear()
+        self.entities.clear()
+
     def add_to_entity(self, entity, component):
         component.entity = entity
         entity.components.add(component)
