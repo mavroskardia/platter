@@ -1,21 +1,18 @@
 class System(object):
 
-    componenttypes = ()
+    componenttypes = set()
 
     def init(self, signaler):
         pass
 
     def update(self, signaler, componentdb):
+        if not self.componenttypes:
+            return
 
-        q = componentdb.thatare(self.componenttypes[0])
-
-        for ctype in self.componenttypes[1:]:
-            q = q.thatare(ctype)
-
-        components = q.get()
+        components = componentdb.thatare(*self.componenttypes).get()
 
         if components:
-            self.process(signaler, *components)
+            self.process(signaler, components)
 
     def process(signaler, *components):
-        pass
+        assert False, 'tried to process the base System class'

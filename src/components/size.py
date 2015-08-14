@@ -1,4 +1,4 @@
-class Dimensions(object):
+class Size(object):
 
     def __init__(self, width=0, height=0):
         self.w = width

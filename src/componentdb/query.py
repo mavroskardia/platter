@@ -1,12 +1,14 @@
+from collections import defaultdict
+
+
 class Query(object):
 
-    def __init__(self, componentdb):
+    def __init__(self, componentdb, *components):
         self.db = componentdb
-        self.types = set()
-
-    def thatare(self, componentcls):
-        self.types.add(componentcls)
-        return self
+        self.types = set(components)
 
     def get(self):
-        return ((c for c in self.db.components[t]) for t in self.types)
+        for e in self.db.entities:
+            if self.types & {type(c) for c in e.components} == self.types:
+                ret = (c for c in e.components if type(c) in self.types)
+                yield sorted(ret, key=lambda c: c.__class__.__name__)

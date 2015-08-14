@@ -1,63 +1,70 @@
+import time
+
+from itertools import chain
 from collections import defaultdict
 
 from .query import Query
 
 
-class ComponentDb(object):
+class EntityComponentDb(object):
 
     def __init__(self):
-        self.components = defaultdict(list)
+        self.components = defaultdict(set)
+        self.entities = set()
 
     def add_to_entity(self, entity, component):
         component.entity = entity
-        self.components[type(component)].append(component)
+        entity.components.add(component)
+        self.entities.add(entity)
+        self.components[type(component)].add(component)
 
-    def thatare(self, componentname):
-        return Query(self).thatare(componentname)
+    def thatare(self, *componentcls):
+        return Query(self, *componentcls)
 
 
 if __name__ == '__main__':
 
     from ..engine.entity import Entity
     from ..components.bordered import Bordered
-    from ..components.dimensions import Dimensions
+    from ..components.dimensions import Size
 
-    onlybordered = Entity()
-    onlydimensions = Entity()
-    both = Entity()
+    bordered = Entity('bordered')
+    dimensions = Entity('dimensions')
+    both = Entity('both')
+    both2 = Entity('both2')
 
-    cdb = ComponentDb()
+    ecdb = EntityComponentDb()
 
-    b1, b2 = Bordered(), Bordered(), Bordered()
-    d1, d2 = Dimensions(), Dimensions(), Dimensions()
+    b1, b2, b3 = Bordered(), Bordered(), Bordered()
+    d1, d2 = Size(), Size()
 
-    cdb.add_to_entity(onlybordered, b1)
-    cdb.add_to_entity(onlydimensions, d1)
-    cdb.add_to_entity(both, b2)
-    cdb.add_to_entity(both, b2)
-    cdb.add_to_entity(both, d2)
+    ecdb.add_to_entity(bordered, b1)
+    ecdb.add_to_entity(bordered, b2)
+    ecdb.add_to_entity(dimensions, d1)
+    ecdb.add_to_entity(both, b3)
+    ecdb.add_to_entity(both, d2)
 
-    bentities = cdb.thatare(Bordered).get()
-    dentities = cdb.thatare(Dimensions).get()
-    bothentities = cdb.thatare(Bordered).thatare(Dimensions).get()
-    bothagain = cdb.thatare(Dimensions).thatare(Bordered).get()
+    time.clock()
 
-    import pdb
-    pdb.set_trace()
+    bcomps = ecdb.thatare(Bordered).get()
+    dcomps = ecdb.thatare(Size).get()
+    bdcomps = ecdb.thatare(Bordered, Size).get()
 
-    assert len(bentities) == 2, 'should have two instances of Bordered'
+    print('relevant part of process ran for {} seconds'.format(time.clock()))
 
-    assert onlybordered in list(bentities), '"onlybordered" not in bordered'
-    assert both in bentities, '"both" not in bordered'
-    assert onlydimensions not in bentities, '"onlydimensions" in bordered'
+    try:
+        bcomps = list(bcomps)
+        assert len(bcomps) == 2, ('Should have found 2 groups of Bordered, but'
+                                  'found {} instead'.format(len(bcomps)))
+        assert {b1, b2} in bcomps, 'Should have one set of b1,b2'
+        assert {b3} in bcomps, 'Should have one set of b3'
 
-    assert onlydimensions in dentities, '"onlydimensions" not in dimensions'
-    assert both in dentities, '"both" in dimensions'
-    assert onlybordered not in dentities, '"onlybordered" in dimensions'
+        bdcomps = list(bdcomps)
+        assert len(bdcomps) == 1, ('Should have found 1 group of '
+                                   'Bordered, Dimensions but found '
+                                   '{} instead'.format(len(bdcomps)))
 
-    assert both in bothentities, '"both" not in both'
-    assert both in bothagain, '"both" not in bothagain'
-    assert onlybordered not in bothentities
-    assert onlybordered not in bothagain
-    assert onlydimensions not in bothentities
-    assert onlydimensions not in bothagain
+    except Exception as e:
+        print(e)
+        import pdb
+        pdb.set_trace()

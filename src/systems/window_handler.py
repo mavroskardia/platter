@@ -22,9 +22,25 @@ class WindowHandler(system.System):
         self.renderer = SDL_CreateRenderer(self.window, -1,
                                            SDL_RENDERER_ACCELERATED)
 
+        self.register_events(signaler)
+
+        self.clear()
+
         return True, 'Initialized WindowHandler successfully'
 
-    def update(self, signaler, componentdb):
+    def clear(self):
         SDL_SetRenderDrawColor(self.renderer, 0, 0, 0, 255)
         SDL_RenderClear(self.renderer)
+
+    def update(self, signaler, componentdb):
         SDL_RenderPresent(self.renderer)
+        self.clear()
+
+    def register_events(self, signaler):
+        signaler.register('draw:rect', self.draw_rect)
+
+    def draw_rect(self, position, size, *args, **kwargs):
+        SDL_SetRenderDrawColor(self.renderer, 255, 255, 255, 255)
+        SDL_RenderDrawRect(
+            self.renderer,
+            SDL_Rect(int(position.x), int(position.y), size.w, size.h))
