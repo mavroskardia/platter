@@ -1,4 +1,6 @@
 # platter
 
-Port of Randy Gaul's Impulse Engine [https://github.com/RandyGaul/ImpulseEngine]
+A homemade ECS and signalling system for building PySDL2 games.
+
+
 
