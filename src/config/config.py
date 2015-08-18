@@ -3,13 +3,12 @@ from imp import importlib
 # Configuration Variables
 resolution = (1280, 790)
 title = 'Platter'
-core_handler = '.systems.sdl_core_handler.SdlCoreHandler'
-input_handler = '.systems.default_input_handler.DefaultInputHandler'
-window_handler = '.systems.window_handler.WindowHandler'
+
+default_world = '.worlds.default.DefaultWorld'
 
 
 # Configuration utility functions
-def load(module_and_class):
+def load(module_and_class, *args, **kwargs):
     parts = module_and_class.split('.')
     mod = '.'.join(parts[:-1])
     m = importlib.import_module(mod, package='src')

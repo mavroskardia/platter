@@ -4,7 +4,6 @@ from sdl2 import *
 from . import system
 
 
-
 class DefaultInputHandler(system.System):
 
     def update(self, signaler, componentdb):
