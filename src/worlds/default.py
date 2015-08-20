@@ -1,5 +1,5 @@
 from ..components.bordered import Bordered
-from ..components.force import Force
+from ..components.forces import AffectedByGravity
 from ..components.position import Position
 from ..components.size import Size
 from ..components.velocity import Velocity
@@ -19,20 +19,20 @@ class DefaultWorld:
             '.systems.default_input_handler.DefaultInputHandler',
             '.systems.window_handler.WindowHandler',
             # world-based systems
+            '.systems.movement_updater.VelocityUpdater',
             '.systems.movement_updater.MovementUpdater',
-            '.systems.force_updater.ForceUpdater',
+            '.systems.movement_updater.PlayerMovementUpdater',
             '.systems.constraints.WorldBoundConstrainer',
             '.systems.border_renderer.BorderRenderer',
             '.systems.player_input_handler.PlayerInputHandler',
-            '.systems.movement_updater.PlayerMovementUpdater',
             '.systems.collision_detection.CollisionDetection',
         )
 
         self.entities = {
-            'Player': (Bordered(), CanCollide(), Force(0, 0), Size(50, 50),
-                       Position(100, 100), Velocity(0, 0), PlayerControls(),
-                       WorldBound(*dimensions)),
+            'Player': (Bordered(), CanCollide(), Size(50, 50),
+                       AffectedByGravity(), Position(100, 100), Velocity(0, 0),
+                       PlayerControls(), WorldBound(*dimensions)),
             'Ground': (Bordered(), Velocity(0, 0), Size(dimensions[0], 10),
-                       Position(0, 700), Force(0, 0), WorldBound(*dimensions),
+                       Position(0, 700), WorldBound(*dimensions),
                        CanCollide(), Static())
         }

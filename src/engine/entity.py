@@ -7,6 +7,10 @@ class Entity(object):
     def __repr__(self):
         return self.name
 
+    def remove(self, *components):
+        for c in components:
+            self.components.remove(c)
+
     def hastype(self, T):
         return T in (type(t) for t in self.components)
 

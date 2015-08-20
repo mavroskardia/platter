@@ -22,6 +22,14 @@ class EntityComponentDb(object):
         self.entities.add(entity)
         self.components[type(component)].add(component)
 
+    def remove_from_entity(self, entity, component_type):
+        comps = entity.oftype(component_type)
+
+        for c in comps:
+            self.components[component_type].remove(c)
+
+        entity.remove(*comps)
+
     def thatare(self, *componentcls):
         return Query(self, *componentcls)
 

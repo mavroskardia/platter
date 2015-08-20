@@ -10,13 +10,19 @@ class CollisionDetection(system.System):
     componenttypes = CanCollide, Position, Size
 
     def process(self, signaler, components):
-
         for c, p1, s1 in components:
             for p2, s2 in [(po, sz) for co, po, sz in components
                            if po.entity != p1.entity]:
 
-                if (abs(p1.x - p2.x) * 2 < s1.w + s2.w and
-                   abs(p1.y - p2.y) * 2 < s1.h + s2.h):
-
+                if (abs(p1.x - p2.x) * 2 < (s1.w + s2.w) and
+                   abs(p1.y - p2.y) * 2 < (s1.h + s2.h)):
                     signaler.trigger('collision', p1.entity, p2.entity,
                                      abs(p1.x - p2.x), abs(p1.y - p2.y))
+
+                    import pdb
+                    pdb.set_trace()
+
+                    p1.nextx = p1.lastx
+                    p1.nexty = p1.lasty
+                    p2.nextx = p2.lastx
+                    p2.nexty = p2.lasty

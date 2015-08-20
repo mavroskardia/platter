@@ -1,7 +1,7 @@
 from . import system
 
 from ..components.position import Position
-from ..components.force import Force
+from ..components.forces import AffectedByGravity
 from ..components.velocity import Velocity
 from ..components.player_controls import PlayerControls
 
@@ -11,32 +11,43 @@ class MovementUpdater(system.System):
     componenttypes = Position, Velocity
 
     def init(self, signaler):
-        signaler.register('collision', self.stop)
+        signaler.register('collision', self.collision)
+        signaler.register('worldbound', self.worldbound)
 
-    def stop(self, e1, e2, xoverlap, yoverlap, *args, **kwargs):
-        for v in e1.oftype(Velocity):
-            if v.directions['up'] or v.directions['down']:
-                v.vy = 0
-            if v.directions['left'] or v.directions['right']:
-                v.vx = 0
+    def collision(self, e1, e2, dx, dy):
+        print('collision!')
+
+    def worldbound(self, p):
+        pass
 
     def process(self, signaler, components):
         for p, v in components:
-            v.directions['right'] = v.vx > 0
-            v.directions['left'] = v.vx < 0
-            v.directions['up'] = v.vy < 0
-            v.directions['down'] = v.vy > 0
-            p.x += v.vx
-            p.y += v.vy
+            p.lastx, p.lasty = p.x, p.y
+            p.x, p.y = p.nextx, p.nexty
+
+
+class VelocityUpdater(system.System):
+
+    componenttypes = Position, Velocity
+
+    gravity = 0.1
+    friction = 0.5
+
+    def process(self, signaler, components):
+        for p, v in components:
+            v.vx *= self.friction
+            v.vy *= self.friction
+            p.nextx = p.x + v.vx
+            p.nexty = p.y + v.vy
 
 
 class PlayerMovementUpdater(system.System):
 
-    componenttypes = PlayerControls, Force
+    componenttypes = PlayerControls, Velocity
 
     def init(self, signaler):
-        self.x = 1
-        self.y = 1
+        self.x = 0
+        self.y = 0
 
         signaler.register('player:Up', self.up)
         signaler.register('player:Down', self.down)
@@ -44,17 +55,19 @@ class PlayerMovementUpdater(system.System):
         signaler.register('player:Right', self.right)
 
     def process(self, signaler, components):
-        for f, pc in components:
-            pass
+        for pc, v in components:
+            v.vx += self.x
+            v.vy += self.y
 
     def up(self, entity, pressed, *args):
-        pass
+        print('up')
+        self.y = -1
 
     def down(self, entity, pressed, *args):
-        pass
+        self.y = 1
 
     def left(self, entity, pressed, *args):
-        pass
+        self.x = -1
 
     def right(self, entity, pressed, *args):
-        pass
+        self.x = 1
