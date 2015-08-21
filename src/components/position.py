@@ -1,7 +1,10 @@
+from collections import deque
+
+
 class Position(object):
     def __init__(self, x=0, y=0):
-        self.lastx = 0
-        self.lasty = 0
+        self.prevx = deque()
+        self.prevy = deque()
         self.x = x
         self.y = y
         self.nextx = 0

@@ -38,4 +38,4 @@ class Engine(object):
         self.running = False
 
     def debug(self):
-        pass
+        self.signaler.trigger('debug', self)

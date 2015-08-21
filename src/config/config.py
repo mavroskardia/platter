@@ -4,7 +4,11 @@ from imp import importlib
 resolution = (1280, 790)
 title = 'Platter'
 
-default_world = '.worlds.default.DefaultWorld'
+# default_world = '.worlds.default.DefaultWorld'
+default_world = '.worlds.default.TileWorld'
+world_args = []
+world_kwargs = {}
+tileset = 'tile.set'
 
 
 # Configuration utility functions

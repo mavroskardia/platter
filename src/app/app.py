@@ -10,7 +10,9 @@ class App(object):
     def run(self):
         engine = Engine()
 
-        world = config.load(config.default_world)(config.resolution)
+        world = config.load(config.default_world)(config.resolution,
+                                                  *config.world_args,
+                                                  **config.world_kwargs)
 
         for system in world.systems:
             s = config.load(system)

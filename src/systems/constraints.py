@@ -16,7 +16,7 @@ class WorldBoundConstrainer(system.System):
                 v.vx = 0
                 signaler.trigger('worldbound', p)
             if p.x + s.w > wb.maxx:
-                p.nextx = wb.maxx - s.w
+                p.nextx = wb.maxx - s.w - 5
                 v.vx = 0
                 signaler.trigger('worldbound', p)
             if p.y < 0:
@@ -24,6 +24,6 @@ class WorldBoundConstrainer(system.System):
                 v.vy = 0
                 signaler.trigger('worldbound', p)
             if p.y + s.h >= wb.maxy:
-                p.nexty = wb.maxy - s.h
+                p.nexty = wb.maxy - s.h - 2
                 v.vy = 0
                 signaler.trigger('worldbound', p)

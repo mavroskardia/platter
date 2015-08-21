@@ -11,34 +11,39 @@ class MovementUpdater(system.System):
     componenttypes = Position, Velocity
 
     def init(self, signaler):
-        signaler.register('collision', self.collision)
-        signaler.register('worldbound', self.worldbound)
+        self.showdebug = False
+        signaler.register('debug', self.debug)
 
-    def collision(self, e1, e2, dx, dy):
-        print('collision!')
-
-    def worldbound(self, p):
-        pass
+    def debug(self, *args, **kwargs):
+        self.showdebug = True
 
     def process(self, signaler, components):
         for p, v in components:
-            p.lastx, p.lasty = p.x, p.y
+            p.prevx.append(p.x)
+            p.prevy.append(p.y)
             p.x, p.y = p.nextx, p.nexty
+
+            if self.showdebug:
+                print('*** MovementUpdater:', p)
+
+        if self.showdebug:
+            self.showdebug = False
 
 
 class VelocityUpdater(system.System):
 
     componenttypes = Position, Velocity
 
+    xfriction = 0.9
+    yfriction = 0.9
     gravity = 0.1
-    friction = 0.9
 
     def process(self, signaler, components):
         for p, v in components:
-            v.vx *= self.friction
-            v.vy *= self.friction
             p.nextx = p.x + v.vx
             p.nexty = p.y + v.vy
+            v.vx *= self.xfriction
+            v.vy *= self.yfriction
 
 
 class PlayerMovementUpdater(system.System):
@@ -49,9 +54,9 @@ class PlayerMovementUpdater(system.System):
         self.x, self.y = 0, 0
 
         signaler.register('player:Up', self.up)
-        signaler.register('player:Down', self.down)
         signaler.register('player:Left', self.left)
         signaler.register('player:Right', self.right)
+        signaler.register('player:Down', self.down)
 
     def process(self, signaler, components):
         for pc, v in components:
