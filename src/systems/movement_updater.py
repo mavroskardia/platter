@@ -31,7 +31,7 @@ class VelocityUpdater(system.System):
     componenttypes = Position, Velocity
 
     gravity = 0.1
-    friction = 0.5
+    friction = 0.9
 
     def process(self, signaler, components):
         for p, v in components:
@@ -46,8 +46,7 @@ class PlayerMovementUpdater(system.System):
     componenttypes = PlayerControls, Velocity
 
     def init(self, signaler):
-        self.x = 0
-        self.y = 0
+        self.x, self.y = 0, 0
 
         signaler.register('player:Up', self.up)
         signaler.register('player:Down', self.down)
@@ -60,14 +59,13 @@ class PlayerMovementUpdater(system.System):
             v.vy += self.y
 
     def up(self, entity, pressed, *args):
-        print('up')
-        self.y = -1
+        self.y = -int(pressed)
 
     def down(self, entity, pressed, *args):
-        self.y = 1
+        self.y = int(pressed)
 
     def left(self, entity, pressed, *args):
-        self.x = -1
+        self.x = -int(pressed)
 
     def right(self, entity, pressed, *args):
-        self.x = 1
+        self.x = int(pressed)
