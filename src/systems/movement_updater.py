@@ -38,6 +38,14 @@ class VelocityUpdater(system.System):
     yfriction = 0.9
     gravity = 0.1
 
+    def init(self, signaler):
+        signaler.register('collision', self.collision)
+
+    def collision(self, e1, e2, dx, dy):
+        for v in e1.oftype(Velocity):
+            v.vx = 0
+            v.vy = 0
+
     def process(self, signaler, components):
         for p, v in components:
             p.nextx = p.x + v.vx

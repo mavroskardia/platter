@@ -18,14 +18,14 @@ class CollisionDetection(system.System):
                     signaler.trigger('collision', p1.entity, p2.entity,
                                      abs(p1.x - p2.x), abs(p1.y - p2.y))
 
-                    while self.algo2(p1, p2, s1, s2):
-                        p1.x, p1.y = p1.prevx.pop(), p1.prevy.pop()
-                        p2.x, p2.y = p2.prevx.pop(), p2.prevy.pop()
-
-                    p1.prevx.clear()
-                    p1.prevy.clear()
-                    p2.prevx.clear()
-                    p2.prevy.clear()
+                    if p1.prevx:
+                        p1.nextx = p1.prevx.pop()
+                    if p1.prevy:
+                        p1.nexty = p1.prevy.pop()
+                    if p2.prevx:
+                        p2.nextx = p2.prevx.pop()
+                    if p2.prevy:
+                        p2.nexty = p2.prevy.pop()
 
     def algo1(self, p1, p2, s1, s2):
         x = abs(p1.x - p2.x) * 2 < (s1.w + s2.w)
