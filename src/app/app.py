@@ -5,7 +5,7 @@ from ..engine.engine import Engine
 from ..engine.entity import Entity
 
 
-class App(object):
+class App:
 
     def run(self):
         engine = Engine()
