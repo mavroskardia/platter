@@ -1,10 +1,26 @@
+import sys
+from sdl2 import *
+
 from . import system
 
 
-class TileEditorInputHandler(system.System):
+class InputSystem(system.System):
 
-    def init(self, signaler):
-        pass
+    def process(self, signaler, componentdb):
 
-    def update(self, signaler, componentdb):
-        pass
+        evt = SDL_Event()
+
+        while SDL_PollEvent(evt):
+
+            if evt.type == SDL_QUIT:
+                signaler.trigger('quit')
+
+            elif evt.type == SDL_KEYDOWN:
+                s = evt.key.keysym.sym
+                msg = 'keydown:{}'.format(SDL_GetKeyName(s).decode())
+                signaler.trigger(msg)
+
+            elif evt.type == SDL_KEYUP:
+                s = evt.key.keysym.sym
+                msg = 'keyup:{}'.format(SDL_GetKeyName(s).decode())
+                signaler.trigger(msg)

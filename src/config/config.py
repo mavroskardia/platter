@@ -1,29 +1,28 @@
-from imp import importlib
+title = 'On a Platter'
 
-# Configuration Variables
 resolution = (1280, 790)
-title = 'Platter'
 
-# default_world = '.worlds.default.DefaultWorld'
-default_world = '.worlds.default.TileWorld'
-world_args = []
-world_kwargs = {}
-tileset = 'tile.set'
+systems = (
+    '.systems.sdlcore.SdlInitSystem',
+    '.systems.sdlcore.SdlWindowSystem',
+    '.systems.input.InputSystem',
+    # game systems
+    '.systems.decorations.BorderRendererSystem'
+    )
 
-
-# Configuration utility functions
-def load(module_and_class, *args, **kwargs):
-    parts = module_and_class.split('.')
-    mod = '.'.join(parts[:-1])
-    m = importlib.import_module(mod, package='src')
-    return getattr(m, parts[-1])
-
-
-if __name__ == '__main__':
-    import os
-
-    os.environ['PYSDL2_DLL_PATH'] = 'lib'
-
-    wh = load('.systems.window_handler.WindowHandler')
-
-    print(wh)
+entities = {
+    'player': (
+        ('.components.decoration.Bordered', ()),
+        ('.components.physical.Position', (100, 100)),
+        ('.components.physical.Size', (50, 50)),
+    ),
+    'notplayer': (
+        ('.components.decoration.Bordered', ()),
+        ('.components.physical.Position', (300, 200)),
+        ('.components.physical.Size', (50, 50)),
+    ),
+    'notbordered': (
+        ('.components.physical.Position', (100, 200)),
+        ('.components.physical.Size', (50, 50)),
+    )
+}

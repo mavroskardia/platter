@@ -1,16 +1,35 @@
+import atexit
 from sdl2 import *
 
 from . import system
 from ..config import config
 
 
-class WindowHandler(system.System):
+class SdlInitSystem(system.System):
+
+    componenttypes = None
+
+    def init(self, signaler):
+        atexit.register(SDL_Quit)
+
+        err = SDL_Init(SDL_INIT_EVERYTHING)
+
+        if err != 0:
+            raise Exception(SDL_GetError())
+
+    def process(self, signaler, components):
+        SDL_Delay(15)
+
+
+class SdlWindowSystem(system.System):
+
+    componenttypes = None
 
     def init(self, signaler):
         err = SDL_VideoInit(None)
 
         if err != 0:
-            return False, SDL_GetError()
+            raise Exception(SDL_GetError())
 
         self.window = SDL_CreateWindow(config.title.encode(),
                                        SDL_WINDOWPOS_CENTERED,
@@ -23,16 +42,16 @@ class WindowHandler(system.System):
                                            SDL_RENDERER_ACCELERATED)
 
         self.register_events(signaler)
-
         self.clear()
 
-        return True, 'Initialized WindowHandler successfully'
+    def register_events(self, signaler):
+        pass
 
     def clear(self):
         SDL_SetRenderDrawColor(self.renderer, 0, 0, 0, 255)
         SDL_RenderClear(self.renderer)
 
-    def update(self, signaler, componentdb):
+    def process(self, signaler, componentdb):
         SDL_RenderPresent(self.renderer)
         self.clear()
 
