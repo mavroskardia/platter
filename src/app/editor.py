@@ -1,8 +1,11 @@
 import sys
 import os
-os.environ['PYSDL2_DLL_PATH'] = 'lib'
 
-from sdl2 import *
+try:
+    os.environ['PYSDL2_DLL_PATH'] = 'lib'
+    from sdl2 import *
+except:
+    sys.exit(1)
 
 
 class Editor:
