@@ -5,6 +5,12 @@ class AffectedByGravity:
     pass
 
 
+class Acceleration:
+    def __init__(self, xacc=0.0, yacc=0.0):
+        self.x = xacc
+        self.y = yacc
+
+
 class Position(object):
     def __init__(self, x=0, y=0):
         self.prevx = deque()
@@ -33,6 +39,3 @@ class Velocity(object):
     def __init__(self, vx=0.0, vy=0.0):
         self.vx = vx
         self.vy = vy
-
-        self.directions = {'up': False, 'down': False,
-                           'left': False, 'right': False}

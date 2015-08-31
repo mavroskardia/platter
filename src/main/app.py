@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 
 try:
     os.environ['PYSDL2_DLL_PATH'] = 'lib'
@@ -25,31 +26,44 @@ class Entity:
 class App:
 
     def __init__(self):
-        self.systemdb = {}
-        self.componentdb = {}
+        self.systemdb = defaultdict(set)
+        self.componentdb = defaultdict(set)
         self.signaler = Signaler()
 
     def add_system(self, system):
         self.systemdb[system.componenttypes].add(system)
 
     def add_entity(self, entity_name, components):
-        types = (type(c) for c in components)
-        types = tuple(sorted(types, key=lambda x: x.__class__.__name__))
-        print('adding entity with components', types)
-        self.componentdb[types].add(Entity(entity_name, components))
+        e = Entity(entity_name, components)
+        comps = components[:]
+        types = tuple(sorted((type(c) for c in comps),
+                             key=lambda x: x.__class__.__name__))
+
+        while comps:
+            print('{}:\n\t{}\n\t{}'.format(types, entity_name, comps))
+            self.componentdb[types].add(e)
+            comps.pop()
 
     def run(self):
 
+        self.register_global_events()
         self.init_systems()
         self.init_entities()
-        self.register_global_events()
 
         self.running = True
+        last_time = time.time()
         while self.running:
+            current = time.time()
+            elapsed = current - last_time
+
             for componenttypes in self.systemdb:
                 for system in self.systemdb[componenttypes]:
-                    system.process(self.signaler,
-                                   self.componentdb[componenttypes])
+                    matchingsets = self.componentdb[componenttypes]
+                    system.process(signaler=self.signaler,
+                                   entities=matchingsets,
+                                   elapsed=elapsed)
+
+            last_time = current
 
     def init_systems(self):
         for system in config.systems:
@@ -68,10 +82,17 @@ class App:
             self.add_entity(entity_name, entity_components)
 
     def register_global_events(self):
+        self.signaler.register('add_entity', self.add_entity)
         self.signaler.register('quit', self.quit)
+        self.signaler.register('keydown:Escape', self.quit)
+        self.signaler.register('keydown:D', self.debug)
 
     def quit(self):
         self.running = False
+
+    def debug(self):
+        print('*** DEBUG: {} in the component db'.format(
+            len(self.componentdb.values())))
 
 
 if __name__ == '__main__':

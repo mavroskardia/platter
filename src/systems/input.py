@@ -6,8 +6,7 @@ from . import system
 
 class InputSystem(system.System):
 
-    def process(self, signaler, componentdb):
-
+    def process(self, *args, signaler=None, entities=None, elapsed=0, **kargs):
         evt = SDL_Event()
 
         while SDL_PollEvent(evt):
