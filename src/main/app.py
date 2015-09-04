@@ -9,7 +9,8 @@ except ImportError:
     print('You have to have the sdl2 dlls in the lib directory')
     sys.exit(1)
 
-from collections import defaultdict
+from collections import defaultdict, deque
+from itertools import combinations
 
 from ..config import config
 from ..config.importer import load
@@ -35,14 +36,25 @@ class App:
 
     def add_entity(self, entity_name, components):
         e = Entity(entity_name, components)
-        comps = components[:]
-        types = tuple(sorted((type(c) for c in comps),
-                             key=lambda x: x.__class__.__name__))
+        combs, comps = [], list(components[:])
+
+        while len(comps) > 0:
+            combs.append(tuple(combinations(comps, len(comps))))
+            comps.pop()
+
+        for comb in combs:
+            self.componentdb[comb].add(e)
+
+        '''
+        comps = deque(components[:])
 
         while comps:
-            print('{}:\n\t{}\n\t{}'.format(types, entity_name, comps))
+            types = tuple(sorted((type(c) for c in comps),
+                                 key=lambda x: x.__class__.__name__))
+            print('adding', e.name, ' as: ', types)
             self.componentdb[types].add(e)
-            comps.pop()
+            comps.popleft()
+        '''
 
     def run(self):
 
@@ -97,4 +109,44 @@ class App:
 
 if __name__ == '__main__':
 
-    App().run()
+    if len(sys.argv) == 1:
+        App().run()
+    else:
+        class A:
+            def __str__(self): return type(self).__class__.__name__
+
+        class B:
+            def __str__(self): return type(self).__class__.__name__
+
+        class C:
+            def __str__(self): return type(self).__class__.__name__
+
+        class D:
+            def __str__(self): return type(self).__class__.__name__
+
+        app = App()
+
+        a, b, c, d = A(), B(), C(), D()
+
+        app.add_entity('test', (c, d, b, a))
+
+        results = [
+            (a, b, c, d),
+            (a, b, c),
+            (a, b, d),
+            (a, c, d),
+            (b, c, d),
+            (a, b),
+            (a, c),
+            (a, d),
+            (b, c),
+            (b, d),
+            (c, d),
+            (a,),
+            (b,),
+            (c,),
+            (d,),
+        ]
+
+        for k in app.componentdb.keys():
+            assert k in results, 'failed: {}'.format(k)

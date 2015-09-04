@@ -23,10 +23,10 @@ entities = {
     'player': (
         ('.components.decoration.Bordered', ()),
         ('.components.physical.Acceleration', (0, 0)),
+        ('.components.player.PlayerControl', ()),
         ('.components.physical.Position', (100, 100)),
         ('.components.physical.Size', (50, 50)),
         ('.components.physical.Velocity', (0, 0)),
-        ('.components.player.PlayerControl', ()),
     ),
     'notplayer': (
         ('.components.decoration.Bordered', ()),

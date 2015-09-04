@@ -9,6 +9,7 @@ class ForceSystem(system.System):
 
     def process(self, *args, signaler=None, entities=None, elapsed=0, **kargs):
         for e in entities:
+            print('ps fs')
             acc, vel = e.components
             vel.x += acc.x * elapsed
             vel.y += acc.y * elapsed
