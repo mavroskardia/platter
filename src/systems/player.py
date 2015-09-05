@@ -9,7 +9,7 @@ class PlayerSystem(system.System):
 
     componenttypes = Acceleration, PlayerControl
 
-    acceleration = 100.0
+    acceleration = 1000.0
 
     def process(s, *args, signaler=None, components=None, elapsed=0, **kargs):
         kp = SDL_GetKeyboardState(None)

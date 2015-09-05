@@ -12,6 +12,9 @@ class ForceSystem(system.System):
             vel.vx += acc.x * elapsed
             vel.vy += acc.y * elapsed
 
+            vel.vx *= 0.95
+            vel.vy *= 0.95
+
 
 class PositionUpdateSystem(system.System):
 
