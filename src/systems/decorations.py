@@ -9,8 +9,8 @@ class BorderRendererSystem(system.System):
 
     componenttypes = Bordered, Position, Size
 
-    def process(self, signaler, entities):
-        print('bordering', len(entities), 'entities')
+    def process(self, *args, signaler=None, entities=None, elapsed=0, **kargs):
+
         for e in entities:
-            bordered, dim, pos = e.components
+            bordered, dim, pos, *rest = e.components
             signaler.trigger('draw:rect', dim, pos)

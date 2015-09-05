@@ -7,8 +7,6 @@ from ..config import config
 
 class SdlInitSystem(system.System):
 
-    componenttypes = None
-
     def init(self, signaler):
         atexit.register(SDL_Quit)
 
@@ -17,13 +15,11 @@ class SdlInitSystem(system.System):
         if err != 0:
             raise Exception(SDL_GetError())
 
-    def process(self, signaler, components):
+    def process(self, *args, signaler=None, entities=None, elapsed=0, **kargs):
         SDL_Delay(15)
 
 
 class SdlWindowSystem(system.System):
-
-    componenttypes = None
 
     def init(self, signaler):
         err = SDL_VideoInit(None)
@@ -51,7 +47,7 @@ class SdlWindowSystem(system.System):
         SDL_SetRenderDrawColor(self.renderer, 0, 0, 0, 255)
         SDL_RenderClear(self.renderer)
 
-    def process(self, signaler, componentdb):
+    def process(self, *args, signaler=None, entities=None, elapsed=0, **kargs):
         SDL_RenderPresent(self.renderer)
         self.clear()
 
@@ -59,8 +55,8 @@ class SdlWindowSystem(system.System):
         signaler.register('draw:rect', self.draw_rect)
         signaler.register('draw:texture', self.draw_texture)
         signaler.register(('_internal:'
-                           'convert_surface_to_texture_and_add_to_tileset'),
-                          self.convert_surface_to_texture_and_add_to_tileset)
+                           'convert_surface_to_texture'),
+                          self.convert_surface_to_texture)
 
     def draw_texture(self, position, size, texture, *args, **kwargs):
         SDL_RenderCopy(self.renderer, texture, None,
@@ -72,8 +68,5 @@ class SdlWindowSystem(system.System):
             self.renderer,
             SDL_Rect(int(position.x), int(position.y), size.w, size.h))
 
-    def convert_surface_to_texture_and_add_to_tileset(self, tileset, surface,
-                                                      tilename):
-
-        t = SDL_CreateTextureFromSurface(self.renderer, surface)
-        tileset[tilename] = t
+    def convert_surface_to_texture(self, surface, callback):
+        callback(SDL_CreateTextureFromSurface(self.renderer, surface))

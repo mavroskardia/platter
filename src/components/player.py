@@ -1,2 +1,2 @@
-class PlayerControls:
+class PlayerControl:
     pass

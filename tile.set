@@ -1,3 +1,7 @@
-default=resources/grass.png
-.=resources/grass.png
-x=resources/brick.png can_walk=False
+[base]
+file = resources/grass.png
+walk = True
+
+[brick]
+file = resources/brick.png
+walk = False
