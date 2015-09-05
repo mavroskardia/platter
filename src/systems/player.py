@@ -11,14 +11,23 @@ class PlayerSystem(system.System):
 
     acceleration = 100.0
 
-    def process(self, *args, signaler=None, entities=None, elapsed=0, **kargs):
+    def process(s, *args, signaler=None, components=None, elapsed=0, **kargs):
         kp = SDL_GetKeyboardState(None)
 
-        self.y_acc = -self.acceleration if kp[SDL_SCANCODE_UP] else 0
-        self.y_acc = self.acceleration if kp[SDL_SCANCODE_DOWN] else 0
-        self.x_acc = -self.acceleration if kp[SDL_SCANCODE_LEFT] else 0
-        self.x_acc = self.acceleration if kp[SDL_SCANCODE_RIGHT] else 0
+        if kp[SDL_SCANCODE_UP]:
+            s.y_acc = -s.acceleration
+        elif kp[SDL_SCANCODE_DOWN]:
+            s.y_acc = s.acceleration
+        else:
+            s.y_acc = 0
 
-        for acc, pc in entities:
-            acc.x = self.x_acc
-            acc.y = self.y_acc
+        if kp[SDL_SCANCODE_LEFT]:
+            s.x_acc = -s.acceleration
+        elif kp[SDL_SCANCODE_RIGHT]:
+            s.x_acc = s.acceleration
+        else:
+            s.x_acc = 0
+
+        for acc, pc in components:
+            acc.x = s.x_acc
+            acc.y = s.y_acc

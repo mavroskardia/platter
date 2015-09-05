@@ -10,7 +10,7 @@ except ImportError:
           ' the sdl2 dlls in the lib directory')
     sys.exit(1)
 
-from collections import defaultdict, deque
+from collections import defaultdict, deque, OrderedDict
 from itertools import combinations
 
 from ..config import config
@@ -28,11 +28,13 @@ class Entity:
 class App:
 
     def __init__(self):
-        self.systemdb = defaultdict(set)
+        self.systemdb = OrderedDict()
         self.componentdb = defaultdict(set)
         self.signaler = Signaler()
 
     def add_system(self, system):
+        if system.componenttypes not in self.systemdb:
+            self.systemdb[system.componenttypes] = set()
         self.systemdb[system.componenttypes].add(system)
 
     def add_entity(self, entity_name, components):
@@ -60,9 +62,6 @@ class App:
         self.running = True
         last_time = time.time()
 
-        for k in self.componentdb.keys():
-            print('{}:\n\t{}'.format(k, self.componentdb[k]))
-
         while self.running:
             current = time.time()
             elapsed = current - last_time
@@ -71,7 +70,7 @@ class App:
                 for system in self.systemdb[componenttypes]:
                     matchingsets = self.componentdb[componenttypes]
                     system.process(signaler=self.signaler,
-                                   entities=matchingsets,
+                                   components=matchingsets,
                                    elapsed=elapsed)
 
             last_time = current
@@ -111,41 +110,44 @@ if __name__ == '__main__':
     if len(sys.argv) == 1:
         App().run()
     else:
-        class A:
-            def __str__(self): return type(self).__class__.__name__
+        def test_add_entity():
+            class A:
+                def __str__(self): return type(self).__class__.__name__
 
-        class B:
-            def __str__(self): return type(self).__class__.__name__
+            class B:
+                def __str__(self): return type(self).__class__.__name__
 
-        class C:
-            def __str__(self): return type(self).__class__.__name__
+            class C:
+                def __str__(self): return type(self).__class__.__name__
 
-        class D:
-            def __str__(self): return type(self).__class__.__name__
+            class D:
+                def __str__(self): return type(self).__class__.__name__
 
-        app = App()
+            app = App()
 
-        a, b, c, d = A(), B(), C(), D()
+            a, b, c, d = A(), B(), C(), D()
 
-        app.add_entity('test', (c, d, b, a))
+            app.add_entity('test', (c, d, b, a))
 
-        results = [
-            (A, B, C, D),
-            (A, B, C),
-            (A, B, D),
-            (A, C, D),
-            (B, C, D),
-            (A, B),
-            (A, C),
-            (A, D),
-            (B, C),
-            (B, D),
-            (C, D),
-            (A,),
-            (B,),
-            (C,),
-            (D,),
-        ]
+            results = [
+                (A, B, C, D),
+                (A, B, C),
+                (A, B, D),
+                (A, C, D),
+                (B, C, D),
+                (A, B),
+                (A, C),
+                (A, D),
+                (B, C),
+                (B, D),
+                (C, D),
+                (A,),
+                (B,),
+                (C,),
+                (D,),
+            ]
 
-        for k in app.componentdb.keys():
-            assert k in results, 'failed: {}'.format(k)
+            for k in app.componentdb.keys():
+                assert k in results, 'failed: {}'.format(k)
+
+        test_add_entity()

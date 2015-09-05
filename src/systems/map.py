@@ -59,7 +59,7 @@ class MapSystem(system.System):
         base_tile = self.tileset.get_base_tile()
 
         w = config.resolution[0] // config.tile_width
-        h = config.resolution[1] // config.tile_height
+        h = config.resolution[1] // config.tile_height + 1
 
         size = Size(config.tile_width, config.tile_height)
         tile = Tile(base_tile.name)
@@ -70,7 +70,7 @@ class MapSystem(system.System):
                 pos = Position(x * config.tile_width, y * config.tile_height)
                 signaler.trigger('add_entity', name, [pos, size, tile])
 
-    def process(self, *args, signaler=None, entities=None, elapsed=0, **kargs):
-        for pos, size, tile in entities:
-            texture = self.tileset.tiles[tile.name].texture
+    def process(s, *args, signaler=None, components=None, elapsed=0, **kargs):
+        for pos, size, tile in components:
+            texture = s.tileset.tiles[tile.name].texture
             signaler.trigger('draw:texture', pos, size, texture)
