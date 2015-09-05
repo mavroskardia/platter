@@ -7,15 +7,14 @@ class ForceSystem(system.System):
 
     componenttypes = Acceleration, Velocity
 
-    gravity = 1.1
+    friction = 0.95
 
     def process(s, *args, signaler=None, components=None, elapsed=0, **kargs):
         for acc, vel in components:
             vel.vx += acc.x * elapsed
-            vel.vy += (acc.y + self.gravity) * elapsed
-
-            vel.vx *= 0.95
-            vel.vy *= 0.95
+            vel.vy += acc.y * elapsed
+            vel.vx *= s.friction
+            vel.vy *= s.friction
 
 
 class PositionUpdateSystem(system.System):
