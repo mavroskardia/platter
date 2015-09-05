@@ -71,7 +71,6 @@ class MapSystem(system.System):
                 signaler.trigger('add_entity', name, [pos, size, tile])
 
     def process(self, *args, signaler=None, entities=None, elapsed=0, **kargs):
-        for e in entities:
-            pos, size, tile = e.components
+        for pos, size, tile in entities:
             texture = self.tileset.tiles[tile.name].texture
             signaler.trigger('draw:texture', pos, size, texture)

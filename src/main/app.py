@@ -6,7 +6,8 @@ try:
     os.environ['PYSDL2_DLL_PATH'] = 'lib'
     from sdl2 import *
 except ImportError:
-    print('You have to have the sdl2 dlls in the lib directory')
+    print('You have to have pysdl2 installed and'
+          ' the sdl2 dlls in the lib directory')
     sys.exit(1)
 
 from collections import defaultdict, deque
@@ -36,25 +37,19 @@ class App:
 
     def add_entity(self, entity_name, components):
         e = Entity(entity_name, components)
-        combs, comps = [], list(components[:])
+        combs, comps = [], list(sorted([type(c) for c in components],
+                                       key=lambda x: x.__name__))
 
-        while len(comps) > 0:
-            combs.append(tuple(combinations(comps, len(comps))))
-            comps.pop()
+        l = len(comps)
+        while l > 0:
+            combos = combinations(comps, l)
+            for c in combos:
+                combs.append(tuple(c))
+            l -= 1
 
         for comb in combs:
-            self.componentdb[comb].add(e)
-
-        '''
-        comps = deque(components[:])
-
-        while comps:
-            types = tuple(sorted((type(c) for c in comps),
-                                 key=lambda x: x.__class__.__name__))
-            print('adding', e.name, ' as: ', types)
-            self.componentdb[types].add(e)
-            comps.popleft()
-        '''
+            self.componentdb[comb].add(tuple(c for c in e.components
+                                             if type(c) in comb))
 
     def run(self):
 
@@ -64,6 +59,10 @@ class App:
 
         self.running = True
         last_time = time.time()
+
+        for k in self.componentdb.keys():
+            print('{}:\n\t{}'.format(k, self.componentdb[k]))
+
         while self.running:
             current = time.time()
             elapsed = current - last_time
@@ -131,21 +130,21 @@ if __name__ == '__main__':
         app.add_entity('test', (c, d, b, a))
 
         results = [
-            (a, b, c, d),
-            (a, b, c),
-            (a, b, d),
-            (a, c, d),
-            (b, c, d),
-            (a, b),
-            (a, c),
-            (a, d),
-            (b, c),
-            (b, d),
-            (c, d),
-            (a,),
-            (b,),
-            (c,),
-            (d,),
+            (A, B, C, D),
+            (A, B, C),
+            (A, B, D),
+            (A, C, D),
+            (B, C, D),
+            (A, B),
+            (A, C),
+            (A, D),
+            (B, C),
+            (B, D),
+            (C, D),
+            (A,),
+            (B,),
+            (C,),
+            (D,),
         ]
 
         for k in app.componentdb.keys():

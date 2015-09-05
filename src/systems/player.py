@@ -9,7 +9,7 @@ class PlayerSystem(system.System):
 
     componenttypes = Acceleration, PlayerControl
 
-    acceleration = 10.0
+    acceleration = 100.0
 
     def process(self, *args, signaler=None, entities=None, elapsed=0, **kargs):
         kp = SDL_GetKeyboardState(None)
@@ -19,7 +19,6 @@ class PlayerSystem(system.System):
         self.x_acc = -self.acceleration if kp[SDL_SCANCODE_LEFT] else 0
         self.x_acc = self.acceleration if kp[SDL_SCANCODE_RIGHT] else 0
 
-        for e in entities:
-            acc, pc = e.components
+        for acc, pc in entities:
             acc.x = self.x_acc
             acc.y = self.y_acc
