@@ -17,7 +17,6 @@ class InputSystem(system.System):
             elif evt.type == SDL_KEYDOWN:
                 s = evt.key.keysym.sym
                 msg = 'keydown:{}'.format(SDL_GetKeyName(s).decode())
-                print(msg)
                 signaler.trigger(msg)
 
             elif evt.type == SDL_KEYUP:

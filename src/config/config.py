@@ -16,11 +16,12 @@ systems = (
     # the physical systems must be in this order
     '.systems.physical.GravitySystem',
     '.systems.physical.GravityCollisionSystem',
+    '.systems.physical.JumpingSystem',
     '.systems.physical.AccelerationSystem',
     '.systems.physical.FrictionSystem',
     '.systems.physical.CollisionDetectionSystem',
     '.systems.physical.PositionUpdateSystem',
-    '.systems.player.PlayerSystem',
+    '.systems.player.PlayerInputSystem',
     # debugging systems
     '.systems.decorations.BorderRendererSystem'
     )
@@ -49,5 +50,12 @@ entities = {
         ('.components.physical.Position', (100, 500)),
         ('.components.physical.Size', (200, 50)),
         ('.components.physical.Velocity', (0, 0)),
-    )
+    ),
+    'obstacle': (
+        ('.components.decoration.Bordered', ()),
+        ('.components.physical.CanCollide', ()),
+        ('.components.physical.Position', (400, 690)),
+        ('.components.physical.Size', (200, 50)),
+        ('.components.physical.Velocity', (0, 0)),
+    ),
 }

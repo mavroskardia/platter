@@ -4,7 +4,7 @@ from . import system
 
 from ..config import config
 from ..components.physical import (Acceleration, AffectedByGravity, Position,
-                                   Velocity, CanCollide, Size)
+                                   Velocity, CanCollide, Size, Jumping)
 
 
 class GravityCollisionSystem(system.System):
@@ -19,8 +19,12 @@ class GravityCollisionSystem(system.System):
 
         for acc, abg, cc in components:
             if cc.colliding:
-                signaler.trigger('remove_component', abg)
-                acc.y = 0
+                if abg.affecting:
+                    acc.y = 0
+                    abg.affecting = False
+                cc.colliding = False
+            else:
+                abg.affecting = True
 
 
 class GravitySystem(system.System):
@@ -34,7 +38,30 @@ class GravitySystem(system.System):
 
     def process(self, *a, signaler, components, elapsed, **k):
         for acc, abg in components:
-            acc.y += self.gravity * elapsed
+            if abg.affecting:
+                acc.y += self.gravity * elapsed
+
+
+class JumpingSystem(system.System):
+
+    componenttypes = Acceleration, Jumping
+
+    jump_force = -50.0
+
+    def init(self, signaler):
+        self.signaler = signaler
+        signaler.register('collision:down', self.done_jumping)
+
+    def done_jumping(self, entity):
+        jump = entity.get_component(Jumping)
+        if jump:
+            self.signaler.trigger('remove_component', jump)
+
+    def process(self, *args, signaler, components, elapsed, **kargs):
+        for acc, jump in components:
+            if not jump.in_progress:
+                acc.y = self.jump_force
+                jump.in_progress = True
 
 
 class AccelerationSystem(system.System):
@@ -44,10 +71,28 @@ class AccelerationSystem(system.System):
 
     componenttypes = Acceleration, Velocity
 
-    def process(s, *args, signaler=None, components=None, elapsed=0, **kargs):
+    def init(self, signaler):
+        signaler.register('collision:down', self.collision)
+        self.reset_y_acceleration = []
+
+    def collision(self, entity):
+        self.reset_y_acceleration.append(entity)
+
+    def process(self, *args, signaler, components, elapsed, **kargs):
+        toremove = []
+
         for acc, vel in components:
             vel.vx += acc.x * elapsed
             vel.vy += acc.y * elapsed
+
+            for e in self.reset_y_acceleration:
+                if acc.entity == e:
+                    acc.y = 0
+                    toremove.append(e)
+
+        for e in toremove:
+            self.reset_y_acceleration.remove(e)
+        toremove.clear()
 
 
 class FrictionSystem(system.System):
@@ -93,6 +138,14 @@ class CollisionDetectionSystem(system.System):
             if self.algo2(b1, b2):
                 cc1.colliding = True
                 cc2.colliding = True
+                for v in (v1, v2):
+                    if v.vy > 0:
+                        signaler.trigger('collision:down', v.entity)
+                        v.vy = -(b1.y + b1.h - b2.y)
+
+            else:
+                cc1.colliding = False
+                cc2.colliding = False
 
     def algo1(self, b1, b2):
         x = abs(b1.x - b2.x) * 2 < (b1.w + b2.w)

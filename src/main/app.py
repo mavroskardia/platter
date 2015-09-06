@@ -20,9 +20,18 @@ from .signaler import Signaler
 
 class Entity:
 
-    def __init__(self, name, components):
+    def __init__(self, name, components=[]):
         self.name = name
         self.components = components
+
+    def __str__(self):
+        return self.name
+
+    def get_component(self, type):
+        for c in self.components:
+            if isinstance(c, type):
+                return c
+        return None
 
 
 class App:
@@ -39,9 +48,8 @@ class App:
             self.systemdb[system.componenttypes] = set()
         self.systemdb[system.componenttypes].add(system)
 
-    def add_entity(self, entity_name, components):
-        e = Entity(entity_name, components)
-        combs, comps = [], list(sorted([type(c) for c in components],
+    def add_entity(self, entity):
+        combs, comps = [], list(sorted([type(c) for c in entity.components],
                                        key=lambda x: x.__name__))
 
         l = len(comps)
@@ -52,10 +60,11 @@ class App:
             l -= 1
 
         for comb in combs:
-            self.componentdb[comb].add(tuple(c for c in e.components
-                                             if type(c) in comb))
+            t = tuple(c for c in entity.components if type(c) in comb)
+            self.componentdb[comb].add(t)
 
-        self.entities.append(e)
+        if entity not in self.entities:
+            self.entities.append(entity)
 
     def run(self):
 
@@ -90,12 +99,15 @@ class App:
 
     def init_entities(self):
         for entity_name in config.entities:
-            entity_components = []
+            entity = Entity(entity_name)
 
+            components = []
             for component, args in config.entities[entity_name]:
-                entity_components.append(load(component)(*args))
+                components.append(load(component)(entity, *args))
 
-            self.add_entity(entity_name, entity_components)
+            entity.components = components
+
+            self.add_entity(entity)
 
     def register_global_events(self):
         self.signaler.register('add_entity', self.add_entity)
@@ -103,6 +115,7 @@ class App:
         self.signaler.register('keydown:Escape', self.quit)
         self.signaler.register('keydown:D', self.debug)
         self.signaler.register('remove_component', self.remove_component)
+        self.signaler.register('add_component', self.add_component)
 
     def process_deferrals(self):
         '''
@@ -110,8 +123,15 @@ class App:
         '''
         for comp in self.deferred_component_removals:
             self.remove_from_componentdb(comp)
+            comp.entity.components.remove(comp)
 
         self.deferred_component_removals.clear()
+
+    def add_component(self, component):
+        types = [type(c) for c in component.entity.components]
+        if type(component) not in types:
+            component.entity.components.append(component)
+            self.add_entity(component.entity)
 
     def remove_component(self, component, *args, **kwargs):
         self.deferred_component_removals.append(component)
@@ -128,7 +148,6 @@ class App:
                         toremove.append((typetuple, componenttuple))
 
         for typetuple, componenttuple in toremove:
-            print(self.componentdb[typetuple])
             self.componentdb[typetuple].remove(componenttuple)
 
     def quit(self):
@@ -161,7 +180,9 @@ if __name__ == '__main__':
 
             a, b, c, d = A(), B(), C(), D()
 
-            app.add_entity('test', (c, d, b, a))
+            e = Entity('test', [a, b, c, d])
+
+            app.add_entity(e)
 
             results = [
                 (A, B, C, D),

@@ -1,37 +1,49 @@
 from collections import deque
 
+from . import component
 
-class CanCollide:
-    def __init__(self):
+
+class Jumping(component.Component):
+    def __init__(self, entity, *args):
+        super().__init__(entity, *args)
+        self.in_progress = False
+
+
+class CanCollide(component.Component):
+    def __init__(self, entity, *args):
+        super().__init__(entity, *args)
         self.colliding = False
 
 
-class AffectedByGravity:
-    pass
+class AffectedByGravity(component.Component):
+    def __init__(self, entity, *args):
+        super().__init__(entity, *args)
+        self.affecting = True
 
 
-class Acceleration:
-    def __init__(self, xacc=0.0, yacc=0.0):
+class Acceleration(component.Component):
+    def __init__(self, entity, xacc=0.0, yacc=0.0, *args):
+        super().__init__(entity, *args)
         self.x = xacc
         self.y = yacc
 
 
-class Position:
-    def __init__(self, x=0, y=0):
+class Position(component.Component):
+    def __init__(self, entity, x=0, y=0, *args):
+        super().__init__(entity)
         self.prevx = deque()
         self.prevy = deque()
         self.x = x
         self.y = y
-        self.nextx = 0
-        self.nexty = 0
 
     def __repr__(self):
         return '({}, {})'.format(self.x, self.y)
 
 
-class Size(object):
+class Size(component.Component):
 
-    def __init__(self, width=0, height=0):
+    def __init__(self, entity, width=0, height=0, *args):
+        super().__init__(entity, *args)
         self.w = width
         self.h = height
 
@@ -39,8 +51,17 @@ class Size(object):
         return '{}x{}'.format(self.w, self.h)
 
 
-class Velocity(object):
+class Velocity(component.Component):
 
-    def __init__(self, vx=0.0, vy=0.0):
+    def __init__(self, entity, vx=0.0, vy=0.0, *args):
+        super().__init__(entity)
         self.vx = vx
         self.vy = vy
+
+    @property
+    def falling(self):
+        return self.vy > 0
+
+    @property
+    def jumping(self):
+        return self.vy < 0

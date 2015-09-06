@@ -1,2 +1,5 @@
-class Bordered(object):
+from . import component
+
+
+class Bordered(component.Component):
     pass

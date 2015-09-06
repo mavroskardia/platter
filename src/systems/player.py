@@ -2,10 +2,10 @@ from sdl2 import *
 
 from . import system
 from ..components.player import PlayerControl
-from ..components.physical import Acceleration
+from ..components.physical import Acceleration, Jumping
 
 
-class PlayerSystem(system.System):
+class PlayerInputSystem(system.System):
 
     componenttypes = Acceleration, PlayerControl
 
@@ -13,15 +13,13 @@ class PlayerSystem(system.System):
     jump_force = -100.0
 
     def init(self, signaler):
-        self.acc_y = 0.0
-        self.initiate_jump = False
-        self.jumping = False
         signaler.register('keydown:Space', self.jump)
+        self.initiate_jump = False
 
     def jump(self):
         self.initiate_jump = True
 
-    def process(self, *args, s=None, components=None, elapsed=0, **kargs):
+    def process(self, *args, signaler, components, elapsed, **kargs):
         kp = SDL_GetKeyboardState(None)
 
         for acc, pc in components:
@@ -33,6 +31,5 @@ class PlayerSystem(system.System):
                 acc.x = 0
 
             if self.initiate_jump:
-                print('jumping')
-                acc.y = self.jump_force
                 self.initiate_jump = False
+                signaler.trigger('add_component', Jumping(pc.entity))

@@ -1,4 +1,8 @@
-class Tile:
+from . import component
 
-    def __init__(self, name):
+
+class Tile(component.Component):
+
+    def __init__(self, entity, name, *args):
+        super().__init__(entity, *args)
         self.name = name
