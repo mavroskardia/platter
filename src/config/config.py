@@ -12,10 +12,16 @@ systems = (
     '.systems.sdlcore.SdlWindowSystem',
     '.systems.input.InputSystem',
     # game systems
-    '.systems.map.MapSystem',
-    '.systems.physical.ForceSystem',
+    # '.systems.map.MapSystem',
+    # the physical systems must be in this order
+    '.systems.physical.GravitySystem',
+    '.systems.physical.GravityCollisionSystem',
+    '.systems.physical.AccelerationSystem',
+    '.systems.physical.FrictionSystem',
+    '.systems.physical.CollisionDetectionSystem',
     '.systems.physical.PositionUpdateSystem',
     '.systems.player.PlayerSystem',
+    # debugging systems
     '.systems.decorations.BorderRendererSystem'
     )
 
@@ -23,18 +29,25 @@ entities = {
     'player': (
         ('.components.decoration.Bordered', ()),
         ('.components.physical.Acceleration', (0, 0)),
+        ('.components.physical.AffectedByGravity', ()),
+        ('.components.physical.CanCollide', ()),
         ('.components.player.PlayerControl', ()),
         ('.components.physical.Position', (100, 100)),
         ('.components.physical.Size', (50, 50)),
         ('.components.physical.Velocity', (0, 0)),
     ),
-    'notplayer': (
+    'ground': (
         ('.components.decoration.Bordered', ()),
-        ('.components.physical.Position', (300, 200)),
-        ('.components.physical.Size', (50, 50)),
+        ('.components.physical.CanCollide', ()),
+        ('.components.physical.Position', (0, resolution[1]-50)),
+        ('.components.physical.Size', (resolution[0], 50)),
+        ('.components.physical.Velocity', (0, 0)),
     ),
-    'notbordered': (
-        ('.components.physical.Position', (100, 200)),
-        ('.components.physical.Size', (50, 50)),
+    'platform': (
+        ('.components.decoration.Bordered', ()),
+        ('.components.physical.CanCollide', ()),
+        ('.components.physical.Position', (100, 500)),
+        ('.components.physical.Size', (200, 50)),
+        ('.components.physical.Velocity', (0, 0)),
     )
 }

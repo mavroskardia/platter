@@ -1,6 +1,11 @@
 from collections import deque
 
 
+class CanCollide:
+    def __init__(self):
+        self.colliding = False
+
+
 class AffectedByGravity:
     pass
 
@@ -11,7 +16,7 @@ class Acceleration:
         self.y = yacc
 
 
-class Position(object):
+class Position:
     def __init__(self, x=0, y=0):
         self.prevx = deque()
         self.prevy = deque()

@@ -28,9 +28,11 @@ class Entity:
 class App:
 
     def __init__(self):
+        self.entities = []
         self.systemdb = OrderedDict()
         self.componentdb = defaultdict(set)
         self.signaler = Signaler()
+        self.deferred_component_removals = []
 
     def add_system(self, system):
         if system.componenttypes not in self.systemdb:
@@ -53,6 +55,8 @@ class App:
             self.componentdb[comb].add(tuple(c for c in e.components
                                              if type(c) in comb))
 
+        self.entities.append(e)
+
     def run(self):
 
         self.register_global_events()
@@ -72,6 +76,8 @@ class App:
                     system.process(signaler=self.signaler,
                                    components=matchingsets,
                                    elapsed=elapsed)
+
+            self.process_deferrals()
 
             last_time = current
 
@@ -96,13 +102,41 @@ class App:
         self.signaler.register('quit', self.quit)
         self.signaler.register('keydown:Escape', self.quit)
         self.signaler.register('keydown:D', self.debug)
+        self.signaler.register('remove_component', self.remove_component)
+
+    def process_deferrals(self):
+        '''
+            Remove all references to a component in the componentdb
+        '''
+        for comp in self.deferred_component_removals:
+            self.remove_from_componentdb(comp)
+
+        self.deferred_component_removals.clear()
+
+    def remove_component(self, component, *args, **kwargs):
+        self.deferred_component_removals.append(component)
+
+    def remove_from_componentdb(self, component):
+        componenttype = type(component)
+
+        toremove = []
+
+        for typetuple in self.componentdb:
+            if typetuple and componenttype in typetuple:
+                for componenttuple in self.componentdb[typetuple]:
+                    if component in componenttuple:
+                        toremove.append((typetuple, componenttuple))
+
+        for typetuple, componenttuple in toremove:
+            print(self.componentdb[typetuple])
+            self.componentdb[typetuple].remove(componenttuple)
 
     def quit(self):
         self.running = False
 
     def debug(self):
-        print('*** DEBUG: {} in the component db'.format(
-            len(self.componentdb.values())))
+        import pdb
+        pdb.set_trace()
 
 
 if __name__ == '__main__':
@@ -148,6 +182,12 @@ if __name__ == '__main__':
             ]
 
             for k in app.componentdb.keys():
-                assert k in results, 'failed: {}'.format(k)
+                assert k in results, k
+
+            app.remove_component(a)
+
+            for types in app.componentdb:
+                for s in app.componentdb[types]:
+                    assert a not in s, 'found {} in {} [[[ {} ]]]'.format(hex(id(a)), s, types)
 
         test_add_entity()

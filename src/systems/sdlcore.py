@@ -53,6 +53,7 @@ class SdlWindowSystem(system.System):
 
     def register_events(self, signaler):
         signaler.register('draw:rect', self.draw_rect)
+        signaler.register('draw:filledrect', self.draw_filled_rect)
         signaler.register('draw:texture', self.draw_texture)
         signaler.register(('_internal:'
                            'convert_surface_to_texture'),
@@ -66,7 +67,15 @@ class SdlWindowSystem(system.System):
         SDL_SetRenderDrawColor(self.renderer, 255, 255, 255, 255)
         SDL_RenderDrawRect(
             self.renderer,
-            SDL_Rect(int(position.x), int(position.y), size.w, size.h))
+            SDL_Rect(int(position.x), int(position.y),
+                     int(size.w), int(size.h)))
+
+    def draw_filled_rect(self, position, size, *args, **kwargs):
+        SDL_SetRenderDrawColor(self.renderer, 255, 255, 255, 255)
+        SDL_RenderFillRect(
+            self.renderer,
+            SDL_Rect(int(position.x), int(position.y),
+                     int(size.w), int(size.h)))
 
     def convert_surface_to_texture(self, surface, callback):
         callback(SDL_CreateTextureFromSurface(self.renderer, surface))

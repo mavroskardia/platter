@@ -9,25 +9,30 @@ class PlayerSystem(system.System):
 
     componenttypes = Acceleration, PlayerControl
 
-    acceleration = 1000.0
+    acceleration = 50.0
+    jump_force = -100.0
 
-    def process(s, *args, signaler=None, components=None, elapsed=0, **kargs):
+    def init(self, signaler):
+        self.acc_y = 0.0
+        self.initiate_jump = False
+        self.jumping = False
+        signaler.register('keydown:Space', self.jump)
+
+    def jump(self):
+        self.initiate_jump = True
+
+    def process(self, *args, s=None, components=None, elapsed=0, **kargs):
         kp = SDL_GetKeyboardState(None)
 
-        if kp[SDL_SCANCODE_UP]:
-            s.y_acc = -s.acceleration
-        elif kp[SDL_SCANCODE_DOWN]:
-            s.y_acc = s.acceleration
-        else:
-            s.y_acc = 0
-
-        if kp[SDL_SCANCODE_LEFT]:
-            s.x_acc = -s.acceleration
-        elif kp[SDL_SCANCODE_RIGHT]:
-            s.x_acc = s.acceleration
-        else:
-            s.x_acc = 0
-
         for acc, pc in components:
-            acc.x = s.x_acc
-            acc.y = s.y_acc
+            if kp[SDL_SCANCODE_LEFT]:
+                acc.x = -self.acceleration
+            elif kp[SDL_SCANCODE_RIGHT]:
+                acc.x = self.acceleration
+            else:
+                acc.x = 0
+
+            if self.initiate_jump:
+                print('jumping')
+                acc.y = self.jump_force
+                self.initiate_jump = False
