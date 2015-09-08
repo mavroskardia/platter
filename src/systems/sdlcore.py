@@ -59,19 +59,17 @@ class SdlWindowSystem(system.System):
         SDL_RenderCopy(self.renderer, texture, None,
                        SDL_Rect(position.x, position.y, size.w, size.h))
 
-    def draw_rect(self, position, size, *args, **kwargs):
+    def draw_rect(self, body, *args, **kwargs):
         SDL_SetRenderDrawColor(self.renderer, 255, 255, 255, 255)
-        SDL_RenderDrawRect(
-            self.renderer,
-            SDL_Rect(int(position.x), int(position.y),
-                     int(size.w), int(size.h)))
+        SDL_RenderDrawRect(self.renderer,
+                           SDL_Rect(int(body.pos.x), int(body.pos.y),
+                                    int(body.w), int(body.h)))
 
-    def draw_filled_rect(self, position, size, *args, **kwargs):
+    def draw_filled_rect(self, body, *args, **kwargs):
         SDL_SetRenderDrawColor(self.renderer, 255, 255, 255, 255)
-        SDL_RenderFillRect(
-            self.renderer,
-            SDL_Rect(int(position.x), int(position.y),
-                     int(size.w), int(size.h)))
+        SDL_RenderFillRect(self.renderer,
+                           SDL_Rect(int(body.pos.x), int(body.pos.y),
+                                    int(body.w), int(body.h)))
 
     def convert_surface_to_texture(self, surface, callback):
         callback(SDL_CreateTextureFromSurface(self.renderer, surface))

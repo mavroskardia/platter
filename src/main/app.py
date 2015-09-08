@@ -39,14 +39,14 @@ class App:
     def __init__(self):
         self.entities = []
         self.systemdb = OrderedDict()
-        self.componentdb = defaultdict(set)
+        self.componentdb = defaultdict(list)
         self.signaler = Signaler()
         self.deferred_component_removals = []
 
     def add_system(self, system):
         if system.componenttypes not in self.systemdb:
-            self.systemdb[system.componenttypes] = set()
-        self.systemdb[system.componenttypes].add(system)
+            self.systemdb[system.componenttypes] = []
+        self.systemdb[system.componenttypes].append(system)
 
     def add_entity(self, entity):
         combs, comps = [], list(sorted([type(c) for c in entity.components],
@@ -61,7 +61,7 @@ class App:
 
         for comb in combs:
             t = tuple(c for c in entity.components if type(c) in comb)
-            self.componentdb[comb].add(t)
+            self.componentdb[comb].append(t)
 
         if entity not in self.entities:
             self.entities.append(entity)
@@ -99,13 +99,33 @@ class App:
 
     def init_entities(self):
         for entity_name in config.entities:
+            print('loading', entity_name, 'with:')
+
             entity = Entity(entity_name)
-
             components = []
-            for component, args in config.entities[entity_name]:
-                components.append(load(component)(entity, *args))
 
-            entity.components = components
+            for compname in config.entities[entity_name]:
+                Component = load(compname)
+
+                args = config.entities[entity_name][compname]
+                if not args:
+                    components.append(Component(entity=entity))
+                    continue
+
+                args, kwargs = args
+                if not args:
+                    args = ()
+                if not kwargs:
+                    kwargs = {}
+
+                kwargs['entity'] = entity
+                components.append(Component(*args, **kwargs))
+
+            entity.components = sorted(components,
+                                       key=lambda c: c.__class__.__name__)
+
+            for c in entity.components:
+                print('\t', c)
 
             self.add_entity(entity)
 

@@ -2,12 +2,12 @@ from sdl2 import *
 
 from . import system
 from ..components.player import PlayerControl
-from ..components.physical import Acceleration, Jumping
+from ..components.physical import Body, Jumping
 
 
 class PlayerInputSystem(system.System):
 
-    componenttypes = Acceleration, PlayerControl
+    componenttypes = Body, PlayerControl
 
     acceleration = 50.0
     jump_force = -100.0
@@ -22,13 +22,13 @@ class PlayerInputSystem(system.System):
     def process(self, *args, signaler, components, elapsed, **kargs):
         kp = SDL_GetKeyboardState(None)
 
-        for acc, pc in components:
+        for body, pc in components:
             if kp[SDL_SCANCODE_LEFT]:
-                acc.x = -self.acceleration
+                body.acc.x = -self.acceleration
             elif kp[SDL_SCANCODE_RIGHT]:
-                acc.x = self.acceleration
+                body.acc.x = self.acceleration
             else:
-                acc.x = 0
+                body.acc.x = 0
 
             if self.initiate_jump:
                 self.initiate_jump = False

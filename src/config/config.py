@@ -1,61 +1,61 @@
+from collections import OrderedDict
+from .constants import *
+
+# General
+
 title = 'On a Platter'
-
 resolution = (1280, 790)
-
 tileset = 'tile.set'
 tile_width = 32
 tile_height = 32
 
-systems = (
-    # core systems
-    '.systems.sdlcore.SdlInitSystem',
-    '.systems.sdlcore.SdlWindowSystem',
-    '.systems.input.InputSystem',
-    # game systems
-    # '.systems.map.MapSystem',
-    # the physical systems must be in this order
-    '.systems.physical.GravitySystem',
-    '.systems.physical.GravityCollisionSystem',
-    '.systems.physical.JumpingSystem',
-    '.systems.physical.AccelerationSystem',
-    '.systems.physical.FrictionSystem',
-    '.systems.physical.CollisionDetectionSystem',
-    '.systems.physical.PositionUpdateSystem',
-    '.systems.player.PlayerInputSystem',
-    # debugging systems
-    '.systems.decorations.BorderRendererSystem'
-    )
+# Constant Values
 
-entities = {
-    'player': (
-        ('.components.decoration.Bordered', ()),
-        ('.components.physical.Acceleration', (0, 0)),
-        ('.components.physical.AffectedByGravity', ()),
-        ('.components.physical.CanCollide', ()),
-        ('.components.player.PlayerControl', ()),
-        ('.components.physical.Position', (100, 100)),
-        ('.components.physical.Size', (50, 50)),
-        ('.components.physical.Velocity', (0, 0)),
-    ),
-    'ground': (
-        ('.components.decoration.Bordered', ()),
-        ('.components.physical.CanCollide', ()),
-        ('.components.physical.Position', (0, resolution[1]-50)),
-        ('.components.physical.Size', (resolution[0], 50)),
-        ('.components.physical.Velocity', (0, 0)),
-    ),
-    'platform': (
-        ('.components.decoration.Bordered', ()),
-        ('.components.physical.CanCollide', ()),
-        ('.components.physical.Position', (100, 500)),
-        ('.components.physical.Size', (200, 50)),
-        ('.components.physical.Velocity', (0, 0)),
-    ),
-    'obstacle': (
-        ('.components.decoration.Bordered', ()),
-        ('.components.physical.CanCollide', ()),
-        ('.components.physical.Position', (400, 690)),
-        ('.components.physical.Size', (200, 50)),
-        ('.components.physical.Velocity', (0, 0)),
-    ),
+gravity = 0.1
+
+# Systems
+
+core_systems = SdlInitSystem, SdlWindowSystem, InputSystem,
+
+game_systems = ()  # Map,
+
+physical_systems = (Gravity, Force, CollisionDetection, PositionUpdate,
+                    PlayerInput,)
+
+debug_systems = BorderRenderer,
+
+systems = core_systems + game_systems + physical_systems + debug_systems
+
+# Seeded Entities
+
+entities = OrderedDict()
+
+entities['ground'] = {
+    Bordered: None,
+    CanCollide: None,
+    Body: (None, {'x': 0, 'y': resolution[1] - 50, 'w': resolution[0],
+                  'h': 50, 'vx': 0, 'vy': 0, 'nx': 0, 'ny': -gravity}),
+}
+
+entities['player'] = {
+    Bordered: None,
+    AffectedByGravity: None,
+    CanCollide: None,
+    PlayerControl: None,
+    Body: (None, {'x': 100, 'y': 100, 'w': 50, 'h': 50, 'vx': 0, 'vy': 0,
+                  'nx': 0, 'ny': 0}),
+}
+
+entities['platform'] = {
+    Bordered: None,
+    CanCollide: None,
+    Body: (None, {'x': 100, 'y': 500, 'w': 200, 'h': 50, 'vx': 0, 'vy': 0,
+                  'nx': 0, 'ny': 0}),
+}
+
+entities['obstacle'] = {
+    Bordered: None,
+    CanCollide: None,
+    Body: (None, {'x': 400, 'y': 690, 'w': 200, 'h': 50, 'vx': 0, 'vy': 0,
+                  'nx': 0, 'ny': 0}),
 }

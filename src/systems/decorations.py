@@ -2,13 +2,13 @@ from sdl2 import *
 
 from . import system
 from ..components.decoration import Bordered
-from ..components.physical import Size, Position
+from ..components.physical import Body
 
 
 class BorderRendererSystem(system.System):
 
-    componenttypes = Bordered, Position, Size
+    componenttypes = Body, Bordered
 
     def process(self, *args, signaler, components, elapsed, **kwargs):
-        for bordered, dim, pos in components:
-            signaler.trigger('draw:rect', dim, pos)
+        for body, bordered, in components:
+            signaler.trigger('draw:rect', body)

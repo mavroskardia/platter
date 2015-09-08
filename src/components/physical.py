@@ -1,5 +1,6 @@
 from collections import deque
 
+from ..math.vector import Vec
 from . import component
 
 
@@ -21,42 +22,25 @@ class AffectedByGravity(component.Component):
         self.affecting = True
 
 
-class Acceleration(component.Component):
-    def __init__(self, entity, xacc=0.0, yacc=0.0, *args):
-        super().__init__(entity, *args)
-        self.x = xacc
-        self.y = yacc
+class Body(component.Component):
 
+    def __init__(self, *args, entity=None,
+                 x=0, y=0, w=0, h=0,
+                 vx=0, vy=0, ax=0, ay=0, nx=-1, ny=-1, mass=1.0, **kwargs):
 
-class Position(component.Component):
-    def __init__(self, entity, x=0, y=0, *args):
         super().__init__(entity)
-        self.prevx = deque()
-        self.prevy = deque()
-        self.x = x
-        self.y = y
+        self.pos = Vec(x, y)
+        self.vel = Vec(vx, vy)
+        self.norm = Vec(nx, ny)
+        self.acc = Vec(ax, ay)
+        self.w, self.h = w, h
+        self.friction = Vec(0, 0)
+        self.mass = mass
+        self.colliding_on_x = False
+        self.colliding_on_y = False
 
-    def __repr__(self):
-        return '({}, {})'.format(self.x, self.y)
-
-
-class Size(component.Component):
-
-    def __init__(self, entity, width=0, height=0, *args):
-        super().__init__(entity, *args)
-        self.w = width
-        self.h = height
-
-    def __repr__(self):
-        return '{}x{}'.format(self.w, self.h)
-
-
-class Velocity(component.Component):
-
-    def __init__(self, entity, vx=0.0, vy=0.0, *args):
-        super().__init__(entity)
-        self.vx = vx
-        self.vy = vy
+    def __str__(self):
+        return 'Body ({s.pos.x}, {s.pos.y}) - {s.w} x {s.h}'.format(s=self)
 
     @property
     def falling(self):
