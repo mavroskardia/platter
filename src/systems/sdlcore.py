@@ -40,9 +40,6 @@ class SdlWindowSystem(system.System):
         self.register_events(signaler)
         self.clear()
 
-    def register_events(self, signaler):
-        pass
-
     def clear(self):
         SDL_SetRenderDrawColor(self.renderer, 0, 0, 0, 255)
         SDL_RenderClear(self.renderer)
@@ -55,8 +52,7 @@ class SdlWindowSystem(system.System):
         signaler.register('draw:rect', self.draw_rect)
         signaler.register('draw:filledrect', self.draw_filled_rect)
         signaler.register('draw:texture', self.draw_texture)
-        signaler.register(('_internal:'
-                           'convert_surface_to_texture'),
+        signaler.register('_internal:convert_surface_to_texture',
                           self.convert_surface_to_texture)
 
     def draw_texture(self, position, size, texture, *args, **kwargs):

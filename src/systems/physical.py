@@ -142,6 +142,9 @@ class CollisionDetectionSystem(system.System):
                     if v.vy > 0:
                         signaler.trigger('collision:down', v.entity)
                         v.vy = -(b1.y + b1.h - b2.y)
+                    if v.vx > 0:
+                        signaler.trigger('collision:right', v.entity)
+                        # v.vx = (b1.x + b1.w - b2.x)
 
             else:
                 cc1.colliding = False
