@@ -11,7 +11,7 @@ tile_height = 32
 
 # Constant Values
 
-gravity = 0.1
+gravity = 2.0
 
 # Systems
 
@@ -50,12 +50,12 @@ entities['platform'] = {
     Bordered: None,
     CanCollide: None,
     Body: (None, {'x': 100, 'y': 500, 'w': 200, 'h': 50, 'vx': 0, 'vy': 0,
-                  'nx': 0, 'ny': 0}),
+                  'nx': 0, 'ny': -gravity}),
 }
 
 entities['obstacle'] = {
     Bordered: None,
     CanCollide: None,
     Body: (None, {'x': 400, 'y': 690, 'w': 200, 'h': 50, 'vx': 0, 'vy': 0,
-                  'nx': 0, 'ny': 0}),
+                  'nx': 0, 'ny': -gravity}),
 }

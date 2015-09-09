@@ -37,11 +37,17 @@ class Vec:
             self.y *= v
         return self
 
+    def __neg__(self):
+        return Vec(-self.x, -self.y)
+
     def __eq__(self, v):
         return self.x == v.x and self.y == v.y
 
     def __str__(self):
         return '<{s.x}, {s.y}>'.format(s=self)
+
+    def __copy__(self):
+        return Vec(self.x, self.y)
 
 
 def dot(self, v1, v2):

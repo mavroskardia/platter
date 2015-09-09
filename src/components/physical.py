@@ -4,12 +4,6 @@ from ..math.vector import Vec
 from . import component
 
 
-class Jumping(component.Component):
-    def __init__(self, entity, *args):
-        super().__init__(entity, *args)
-        self.in_progress = False
-
-
 class CanCollide(component.Component):
     def __init__(self, entity, *args):
         super().__init__(entity, *args)
@@ -40,7 +34,12 @@ class Body(component.Component):
         self.colliding_on_y = False
 
     def __str__(self):
-        return 'Body ({s.pos.x}, {s.pos.y}) - {s.w} x {s.h}'.format(s=self)
+        return '''Body for {s.entity.name}:
+    Position:       {s.pos}
+    Dimensions:     {s.w} x {s.h}
+    Velocity:       {s.vel}
+    Acceleration:   {s.acc}
+'''.format(s=self)
 
     @property
     def falling(self):

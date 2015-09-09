@@ -4,8 +4,7 @@ from . import system
 
 from ..config import config
 from ..math.vector import Vec
-from ..components.physical import (AffectedByGravity, Body, CanCollide,
-                                   Jumping)
+from ..components.physical import AffectedByGravity, Body, CanCollide
 
 
 class GravitySystem(system.System):
@@ -52,8 +51,6 @@ class CollisionDetectionSystem(system.System):
                 if body == otherbody:
                     continue
 
-                # print(body.entity, 'vs', otherbody.entity)
-
                 b1 = Body(x=body.pos.x + body.vel.x * elapsed,
                           y=body.pos.y + body.vel.y * elapsed,
                           w=body.w, h=body.h)
@@ -62,18 +59,12 @@ class CollisionDetectionSystem(system.System):
                           y=otherbody.pos.y + otherbody.vel.y * elapsed,
                           w=otherbody.w, h=otherbody.h)
 
-                if self.algo2(b1, b2):
-                    body.acc -= otherbody.friction
-                    body.acc -= otherbody.norm
-                    body.vel = Vec(0, 0)
+                if self.arecolliding(b1, b2):
+                    body.vel = otherbody.vel.copy()
+                    body.acc = otherbody.norm.copy()
+                    print(body)
 
-    def algo1(self, b1, b2):
-        x = abs(b1.x - b2.x) * 2 < (b1.w + b2.w)
-        y = abs(b1.y - b2.y) * 2 < (b1.h + b2.h)
-
-        return x and y
-
-    def algo2(self, b1, b2):
+    def arecolliding(self, b1, b2):
         return (b1.pos.x < b2.pos.x + b2.w and
                 b1.pos.x + b1.w > b2.pos.x and
                 b1.pos.y < b2.pos.y + b2.h and
