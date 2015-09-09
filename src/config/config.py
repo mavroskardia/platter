@@ -30,13 +30,6 @@ systems = core_systems + game_systems + physical_systems + debug_systems
 
 entities = OrderedDict()
 
-entities['ground'] = {
-    Bordered: None,
-    CanCollide: None,
-    Body: (None, {'x': 0, 'y': resolution[1] - 50, 'w': resolution[0],
-                  'h': 50, 'vx': 0, 'vy': 0, 'nx': 0, 'ny': -gravity}),
-}
-
 entities['player'] = {
     Bordered: None,
     AffectedByGravity: None,
@@ -46,16 +39,23 @@ entities['player'] = {
                   'nx': 0, 'ny': 0}),
 }
 
+entities['ground'] = {
+    Bordered: None,
+    CanCollide: None,
+    Body: (None, {'x': 0, 'y': resolution[1] - 50, 'w': resolution[0],
+                  'h': 50, 'vx': 0, 'vy': 0, 'nx': 0, 'ny': -gravity}),
+}
+
 entities['platform'] = {
     Bordered: None,
     CanCollide: None,
     Body: (None, {'x': 100, 'y': 500, 'w': 200, 'h': 50, 'vx': 0, 'vy': 0,
-                  'nx': 0, 'ny': -gravity}),
+                  'nx': -10.0, 'ny': -gravity}),
 }
 
 entities['obstacle'] = {
     Bordered: None,
     CanCollide: None,
     Body: (None, {'x': 400, 'y': 690, 'w': 200, 'h': 50, 'vx': 0, 'vy': 0,
-                  'nx': 0, 'ny': -gravity}),
+                  'nx': -10.0, 'ny': -gravity}),
 }

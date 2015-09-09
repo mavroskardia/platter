@@ -1,3 +1,4 @@
+from copy import copy
 from itertools import combinations
 
 from . import system
@@ -60,9 +61,8 @@ class CollisionDetectionSystem(system.System):
                           w=otherbody.w, h=otherbody.h)
 
                 if self.arecolliding(b1, b2):
-                    body.vel = otherbody.vel.copy()
-                    body.acc = otherbody.norm.copy()
-                    print(body)
+                    body.vel = copy(otherbody.vel)
+                    body.acc = copy(otherbody.norm)
 
     def arecolliding(self, b1, b2):
         return (b1.pos.x < b2.pos.x + b2.w and
