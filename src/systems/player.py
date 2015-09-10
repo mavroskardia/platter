@@ -11,8 +11,8 @@ class PlayerInputSystem(system.System):
 
     componenttypes = Body, PlayerControl
 
-    acceleration = 50.0
-    jump_force = Vec(0, -50.0)
+    acceleration = 10.0
+    jump_force = Vec(0, -30.0)
 
     def init(self, signaler):
         signaler.register('keydown:Space', self.jump)
@@ -34,4 +34,6 @@ class PlayerInputSystem(system.System):
 
             if self.initiate_jump:
                 self.initiate_jump = False
-                body.acc += self.jump_force
+                if not body.jumping:
+                    body.acc += self.jump_force
+                    body.jumping = True

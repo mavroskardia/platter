@@ -29,12 +29,13 @@ class ForceSystem(system.System):
 
     componenttypes = Body,
 
-    friction = 0.9
+    air_friction = 0.9
 
     def process(self, *args, signaler, components, elapsed, **kwargs):
         for body, in components:
             body.vel += body.acc
-            body.vel *= self.friction
+            if not body.colliding:
+                body.vel *= self.air_friction
 
 
 class CollisionDetectionSystem(system.System):
@@ -52,17 +53,21 @@ class CollisionDetectionSystem(system.System):
                 if body == otherbody:
                     continue
 
-                b1 = Body(x=body.pos.x + body.vel.x * elapsed,
+                b1 = Body(body.entity,
+                          x=body.pos.x + body.vel.x * elapsed,
                           y=body.pos.y + body.vel.y * elapsed,
                           w=body.w, h=body.h)
 
-                b2 = Body(x=otherbody.pos.x + otherbody.vel.x * elapsed,
+                b2 = Body(body.entity,
+                          x=otherbody.pos.x + otherbody.vel.x * elapsed,
                           y=otherbody.pos.y + otherbody.vel.y * elapsed,
                           w=otherbody.w, h=otherbody.h)
 
                 if self.arecolliding(b1, b2):
                     body.vel = copy(otherbody.vel)
                     body.acc = copy(otherbody.norm)
+                    body.colliding = True
+                    body.jumping = False
 
     def arecolliding(self, b1, b2):
         return (b1.pos.x < b2.pos.x + b2.w and

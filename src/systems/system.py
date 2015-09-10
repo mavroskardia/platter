@@ -5,5 +5,5 @@ class System:
     def init(self, signaler):
         pass
 
-    def process(self, signaler=None, components=None, elapsed=0, *args, **kargs):
+    def process(self, *a, signaler=None, components=None, elapsed=0, **kw):
         pass

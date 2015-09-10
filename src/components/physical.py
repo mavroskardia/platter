@@ -1,37 +1,33 @@
 from collections import deque
 
 from ..math.vector import Vec
-from . import component
+from .component import Component
 
 
-class CanCollide(component.Component):
-    def __init__(self, entity, *args):
-        super().__init__(entity, *args)
+class CanCollide(Component):
+    def __init__(self, entity, *args, **kwargs):
+        super().__init__(entity, *args, **kwargs)
         self.colliding = False
 
 
-class AffectedByGravity(component.Component):
-    def __init__(self, entity, *args):
-        super().__init__(entity, *args)
+class AffectedByGravity(Component):
+    def __init__(self, entity, *args, **kwargs):
+        super().__init__(entity, *args, **kwargs)
         self.affecting = True
 
 
-class Body(component.Component):
+class Body(Component):
 
-    def __init__(self, *args, entity=None,
-                 x=0, y=0, w=0, h=0,
-                 vx=0, vy=0, ax=0, ay=0, nx=-1, ny=-1, mass=1.0, **kwargs):
-
-        super().__init__(entity)
-        self.pos = Vec(x, y)
-        self.vel = Vec(vx, vy)
-        self.norm = Vec(nx, ny)
-        self.acc = Vec(ax, ay)
-        self.w, self.h = w, h
-        self.friction = Vec(0, 0)
-        self.mass = mass
-        self.colliding_on_x = False
-        self.colliding_on_y = False
+    def __init__(self, entity, *args, **kwargs):
+        super().__init__(entity, *args, **kwargs)
+        self.pos = Vec(kwargs.get('x', 0.0), kwargs.get('y', 0.0))
+        self.vel = Vec(kwargs.get('vx', 0.0), kwargs.get('vy', 0.0))
+        self.norm = Vec(kwargs.get('nx', 0.0), kwargs.get('ny', 0.0))
+        self.acc = Vec(kwargs.get('ax', 0.0), kwargs.get('ay', 0.0))
+        self.friction = Vec(kwargs.get('fx', 0.0), kwargs.get('fy', 0.0))
+        self.w, self.h = kwargs.get('w', 10), kwargs.get('h', 10)
+        self.mass = kwargs.get('mass', 1.0)
+        self.colliding = False
 
     def __str__(self):
         return '''Body for {s.entity.name}:
@@ -40,11 +36,3 @@ class Body(component.Component):
     Velocity:       {s.vel}
     Acceleration:   {s.acc}
 '''.format(s=self)
-
-    @property
-    def falling(self):
-        return self.vy > 0
-
-    @property
-    def jumping(self):
-        return self.vy < 0

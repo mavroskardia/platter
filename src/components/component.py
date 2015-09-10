@@ -1,5 +1,5 @@
 class Component:
-    def __init__(self, entity, *args):
+    def __init__(self, entity, *args, **kwargs):
         self.entity = entity
 
     def __str__(self):
