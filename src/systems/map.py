@@ -55,7 +55,8 @@ class MapSystem(system.System):
     componenttypes = Position, Size, Tile
 
     def init(self, signaler):
-        self.tileset = TileSet(config.tileset, signaler)
+        tile_file = os.path.join('resources', config.tileset)
+        self.tileset = TileSet(tile_file, signaler)
         base_tile = self.tileset.get_base_tile()
 
         w = config.resolution[0] // config.tile_width

@@ -5,9 +5,12 @@ from .constants import *
 
 title = 'On a Platter'
 resolution = (1280, 790)
+
 tileset = 'tile.set'
 tile_width = 32
 tile_height = 32
+
+default_spriteset = 'sprite.set'
 
 # Constant Values
 
