@@ -1,5 +1,7 @@
 import atexit
+
 from sdl2 import *
+from sdl2.sdlttf import *
 
 from . import system
 from ..config import config
@@ -27,6 +29,11 @@ class SdlWindowSystem(system.System):
         if err != 0:
             raise Exception(SDL_GetError())
 
+        err = TTF_Init()
+
+        if err != 0:
+            raise Exception(TTF_GetError())
+
         self.window = SDL_CreateWindow(config.title.encode(),
                                        SDL_WINDOWPOS_CENTERED,
                                        SDL_WINDOWPOS_CENTERED,
@@ -36,6 +43,11 @@ class SdlWindowSystem(system.System):
 
         self.renderer = SDL_CreateRenderer(self.window, -1,
                                            SDL_RENDERER_ACCELERATED)
+
+        self.font = TTF_OpenFont(config.hud_font.encode(),
+                                 config.hud_font_size)
+        if not self.font:
+            raise Exception(TTF_GetError())
 
         self.register_events(signaler)
         self.clear()
@@ -52,6 +64,7 @@ class SdlWindowSystem(system.System):
         signaler.register('draw:rect', self.draw_rect)
         signaler.register('draw:filledrect', self.draw_filled_rect)
         signaler.register('draw:texture', self.draw_texture)
+        signaler.register('draw:text', self.draw_text)
         signaler.register('_internal:convert_surface_to_texture',
                           self.convert_surface_to_texture)
 
@@ -73,3 +86,12 @@ class SdlWindowSystem(system.System):
 
     def convert_surface_to_texture(self, surface, callback):
         callback(SDL_CreateTextureFromSurface(self.renderer, surface))
+
+    def draw_text(self, body, text, *args, **kwargs):
+        t = TTF_RenderUTF8_Blended(self.font, text.text.encode(),
+                                   SDL_Color(255, 255, 255, 255))
+        tex = SDL_CreateTextureFromSurface(self.renderer, t)
+        body.w, body.h = t.contents.w, t.contents.h
+        SDL_RenderCopy(self.renderer, tex, None,
+                       SDL_Rect(int(body.pos.x), int(body.pos.y),
+                                int(body.w), int(body.h)))

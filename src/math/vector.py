@@ -2,7 +2,10 @@ import math
 
 
 class Vec:
-
+    '''
+        In keeping with tradition, a re-implementation of the wheel... i mean,
+        2d vector.
+    '''
     def __init__(self, x, y):
         self.x = x
         self.y = y

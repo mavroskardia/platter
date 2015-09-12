@@ -12,6 +12,7 @@ Force = '.systems.physical.ForceSystem'
 CollisionDetection = '.systems.physical.CollisionDetectionSystem'
 PositionUpdate = '.systems.physical.PositionUpdateSystem'
 PlayerInput = '.systems.player.PlayerInputSystem'
+Hud = '.systems.hud.HudSystem'
 
 # Systems -- Debugging
 
@@ -23,6 +24,7 @@ AffectedByGravity = '.components.physical.AffectedByGravity'
 CanCollide = '.components.physical.CanCollide'
 PlayerControl = '.components.player.PlayerControl'
 Body = '.components.physical.Body'
+Text = '.components.hud.Text'
 
 # Components -- Debugging
 
