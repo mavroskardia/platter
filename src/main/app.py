@@ -118,8 +118,7 @@ class App:
                 if not kwargs:
                     kwargs = {}
 
-                kwargs['entity'] = entity
-                components.append(Component(*args, **kwargs))
+                components.append(Component(entity, *args, **kwargs))
 
             entity.components = sorted(components,
                                        key=lambda c: c.__class__.__name__)

@@ -5,15 +5,11 @@ from .component import Component
 
 
 class CanCollide(Component):
-    def __init__(self, entity, *args, **kwargs):
-        super().__init__(entity, *args, **kwargs)
-        self.colliding = False
+    pass
 
 
 class AffectedByGravity(Component):
-    def __init__(self, entity, *args, **kwargs):
-        super().__init__(entity, *args, **kwargs)
-        self.affecting = True
+    pass
 
 
 class Body(Component):
@@ -27,7 +23,8 @@ class Body(Component):
         self.friction = Vec(kwargs.get('fx', 0.0), kwargs.get('fy', 0.0))
         self.w, self.h = kwargs.get('w', 10), kwargs.get('h', 10)
         self.mass = kwargs.get('mass', 1.0)
-        self.colliding = False
+        self.colliding_with = []
+        self.jumping = False
 
     def __str__(self):
         return '''Body for {s.entity.name}:
@@ -36,3 +33,10 @@ class Body(Component):
     Velocity:       {s.vel}
     Acceleration:   {s.acc}
 '''.format(s=self)
+
+    @property
+    def moving(self):
+        return self.vel.x > 0 or self.vel.y > 0
+
+    def higher_than(self, other):
+        return self.pos.y + self.h >= other.pos.y

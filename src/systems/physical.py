@@ -29,13 +29,17 @@ class ForceSystem(system.System):
 
     componenttypes = Body,
 
-    air_friction = 0.9
+    air_friction = Vec(config.air_friction_x, config.air_friction_y)
 
     def process(self, *args, signaler, components, elapsed, **kwargs):
         for body, in components:
             body.vel += body.acc
-            if not body.colliding:
-                body.vel *= self.air_friction
+            if body.colliding_with:
+                if body.higher_than(body.colliding_with[0]):
+                    f = body.colliding_with[0].friction
+                    body.vel *= f
+                    continue
+            body.vel *= self.air_friction
 
 
 class CollisionDetectionSystem(system.System):
@@ -66,8 +70,13 @@ class CollisionDetectionSystem(system.System):
                 if self.arecolliding(b1, b2):
                     body.vel = copy(otherbody.vel)
                     body.acc = copy(otherbody.norm)
-                    body.colliding = True
+                    body.colliding_with.append(otherbody)
                     body.jumping = False
+                else:
+                    try:
+                        body.colliding_with.remove(otherbody)
+                    except ValueError:  # safely ignore non-existent value
+                        pass
 
     def arecolliding(self, b1, b2):
         return (b1.pos.x < b2.pos.x + b2.w and

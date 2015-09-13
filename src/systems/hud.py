@@ -1,4 +1,6 @@
 from . import system
+from ..components.physical import Body
+from ..components.hud import Text
 
 
 class HudSystem(system.System):
@@ -8,4 +10,4 @@ class HudSystem(system.System):
     def process(self, *args, signaler, components, elapsed, **kwargs):
 
         for body, text in components:
-            pass
+            signaler.trigger('draw:text', body, text)
