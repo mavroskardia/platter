@@ -8,15 +8,19 @@ from .constants import *
 title = 'On a Platter'
 resolution = (1280, 790)
 
-tileset = 'tile.set'
+# Tiles
+
+tileset = os.path.join('resources', 'tilesets', 'default.set')
 tile_width = 32
 tile_height = 32
 
-default_spriteset = 'sprite.set'
+# Sprites
+
+default_spriteset = os.path.join('resources', 'sprites', 'default.set')
 
 # Fonts
 
-hud_font = os.path.join('resources', 'aard.ttf')
+hud_font = os.path.join('resources', 'fonts', 'aard.ttf')
 hud_font_size = 32
 
 # Constant Values
