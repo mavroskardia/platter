@@ -20,10 +20,10 @@ class MapSystem(system.System):
         self.create_map()
 
     def set_renderer(self):
-        def set(renderer):
+        def setr(renderer):
             self.renderer = renderer
 
-        self.signaler.trigger('get_renderer', set)
+        self.signaler.trigger('get_renderer', setr)
 
     def create_map(self):
         self.tileset = MapLoader(self.signaler).load(config.tileset)

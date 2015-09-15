@@ -1,4 +1,4 @@
-from collections import deque
+from collections import deque, namedtuple
 
 from ..math.vector import Vec
 from .component import Component
@@ -13,6 +13,8 @@ class AffectedByGravity(Component):
 
 
 class Body(Component):
+
+    Rect = namedtuple('Rect', ('x', 'y', 'w', 'h'))
 
     def __init__(self, entity, *args, **kwargs):
         super().__init__(entity, *args, **kwargs)
@@ -40,3 +42,6 @@ class Body(Component):
 
     def higher_than(self, other):
         return self.pos.y + self.h >= other.pos.y
+
+    def as_rect(self):
+        return Body.Rect(self.pos.x, self.pos.y, self.w, self.h)

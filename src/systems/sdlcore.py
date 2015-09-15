@@ -18,7 +18,7 @@ class SdlInitSystem(system.System):
             raise Exception(SDL_GetError())
 
     def process(self, *args, signaler=None, entities=None, elapsed=0, **kargs):
-        SDL_Delay(1)
+        SDL_Delay(5)
 
 
 class SdlWindowSystem(system.System):
@@ -72,30 +72,26 @@ class SdlWindowSystem(system.System):
     def get_renderer(self, callback):
         callback(self.renderer)
 
-    def draw_texture(self, texture, x, y, w, h, *args, **kwargs):
-        SDL_RenderCopy(self.renderer, texture, None,
-                       SDL_Rect(int(x), int(y), int(w), int(h)))
+    def draw_texture(self, texture, rect, *args, **kwargs):
+        r = SDL_Rect(int(rect.x), int(rect.y), int(rect.w), int(rect.h))
+        SDL_RenderCopy(self.renderer, texture, None, r)
 
-    def draw_rect(self, body, *args, **kwargs):
+    def draw_rect(self, rect, *args, **kwargs):
+        r = SDL_Rect(int(rect.x), int(rect.y), int(rect.w), int(rect.h))
         SDL_SetRenderDrawColor(self.renderer, 255, 255, 255, 255)
-        SDL_RenderDrawRect(self.renderer,
-                           SDL_Rect(int(body.pos.x), int(body.pos.y),
-                                    int(body.w), int(body.h)))
+        SDL_RenderDrawRect(self.renderer, r)
 
-    def draw_filled_rect(self, body, *args, **kwargs):
+    def draw_filled_rect(self, rect, *args, **kwargs):
+        r = SDL_Rect(int(rect.x), int(rect.y), int(rect.w), int(rect.h))
         SDL_SetRenderDrawColor(self.renderer, 255, 255, 255, 255)
-        SDL_RenderFillRect(self.renderer,
-                           SDL_Rect(int(body.pos.x), int(body.pos.y),
-                                    int(body.w), int(body.h)))
+        SDL_RenderFillRect(self.renderer, r)
 
     def convert_surface_to_texture(self, surface, callback):
         callback(SDL_CreateTextureFromSurface(self.renderer, surface))
 
-    def draw_text(self, body, text, *args, **kwargs):
-        t = TTF_RenderUTF8_Blended(self.font, text.text.encode(),
-                                   SDL_Color(255, 255, 255, 255))
+    def draw_text(self, text, rect, *args, **kwargs):
+        c = SDL_Color(255, 255, 255, 255)
+        t = TTF_RenderUTF8_Blended(self.font, text.encode(), c)
+        r = SDL_Rect(int(rect.x), int(rect.y), t.contents.w, t.contents.h)
         tex = SDL_CreateTextureFromSurface(self.renderer, t)
-        body.w, body.h = t.contents.w, t.contents.h
-        SDL_RenderCopy(self.renderer, tex, None,
-                       SDL_Rect(int(body.pos.x), int(body.pos.y),
-                                int(body.w), int(body.h)))
+        SDL_RenderCopy(self.renderer, tex, None, r)

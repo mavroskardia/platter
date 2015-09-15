@@ -20,6 +20,34 @@ from .. import config
 from ..config.importer import load
 
 
+class Fps:
+
+    UpdateInterval = 60
+
+    def __init__(self, signaler):
+        self.signaler = signaler
+        self.fps = 0
+        self.ticks = 0
+        self.current = 0
+        self.elapsed = 0
+
+    def init(self):
+        self.ticks = 0
+        self.last_time = time.time()
+
+    def tick_start(self):
+        self.current = time.time()
+        self.elapsed = self.current - self.last_time
+        self.fps = 1 / (self.elapsed + 0.00001)
+        self.ticks += 1
+
+    def tick_end(self):
+        self.last_time = self.current
+        if self.ticks == Fps.UpdateInterval:
+            self.ticks = 0
+            self.signaler.trigger('fps_update', self.fps)
+
+
 class App:
 
     def __init__(self):
@@ -27,6 +55,7 @@ class App:
         self.systemdb = OrderedDict()
         self.componentdb = defaultdict(list)
         self.signaler = Signaler()
+        self.fps = Fps(self.signaler)
         self.deferred_component_removals = []
 
     def add_system(self, system):
@@ -37,7 +66,7 @@ class App:
     def add_entity(self, entity):
         combs, comps = [], list(sorted([type(c) for c in entity.components],
                                        key=lambda x: x.__name__))
-        print('adding {} with {}'.format(entity, comps))
+
         l = len(comps)
         while l > 0:
             combos = combinations(comps, l)
@@ -57,24 +86,22 @@ class App:
         self.register_global_events()
         self.init_systems()
         self.init_entities()
+        self.fps.init()
 
         self.running = True
-        last_time = time.time()
 
         while self.running:
-            current = time.time()
-            elapsed = current - last_time
+            self.fps.tick_start()
 
             for componenttypes in self.systemdb:
                 for system in self.systemdb[componenttypes]:
-                    matchingsets = self.componentdb[componenttypes]
                     system.process(signaler=self.signaler,
-                                   components=matchingsets,
-                                   elapsed=elapsed)
+                                   components=self.componentdb[componenttypes],
+                                   elapsed=self.fps.elapsed)
 
             self.process_deferrals()
 
-            last_time = current
+            self.fps.tick_end()
 
     def init_systems(self):
         for system in config.systems:
@@ -85,8 +112,6 @@ class App:
 
     def init_entities(self):
         for entity_name in config.entities:
-            print('loading', entity_name, 'with:')
-
             entity = Entity(entity_name)
             components = []
 
@@ -108,9 +133,6 @@ class App:
 
             entity.components = sorted(components,
                                        key=lambda c: c.__class__.__name__)
-
-            for c in entity.components:
-                print('\t', c)
 
             self.add_entity(entity)
 
@@ -160,8 +182,9 @@ class App:
         self.running = False
 
     def debug(self):
-        import pdb
-        pdb.set_trace()
+        print('FPS:', self.fps)
+        # import pdb
+        # pdb.set_trace()
 
 
 if __name__ == '__main__':
