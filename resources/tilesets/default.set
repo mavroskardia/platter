@@ -1,15 +1,15 @@
 [base]
-file = resources/sky.png
+file = resources/tiles/sky.png
 walk = True
 
 [grass]
-file = resources/grass.png
+file = resources/tiles/grass.png
 walk = True
 
 [brick]
-file = resources/brick.png
+file = resources/tiles/brick.png
 walk = False
 
 [sky]
-file = resources/sky.png
+file = resources/tiles/sky.png
 walk = True

@@ -10,3 +10,4 @@ game = Map,
 debug = BorderRenderer, Hud
 
 systems = core + physical + game + debug
+# systems = core + physical + debug

@@ -18,7 +18,7 @@ class SdlInitSystem(system.System):
             raise Exception(SDL_GetError())
 
     def process(self, *args, signaler=None, entities=None, elapsed=0, **kargs):
-        SDL_Delay(15)
+        SDL_Delay(1)
 
 
 class SdlWindowSystem(system.System):
@@ -61,6 +61,7 @@ class SdlWindowSystem(system.System):
         self.clear()
 
     def register_events(self, signaler):
+        signaler.register('get_renderer', self.get_renderer)
         signaler.register('draw:rect', self.draw_rect)
         signaler.register('draw:filledrect', self.draw_filled_rect)
         signaler.register('draw:texture', self.draw_texture)
@@ -68,10 +69,12 @@ class SdlWindowSystem(system.System):
         signaler.register('_internal:convert_surface_to_texture',
                           self.convert_surface_to_texture)
 
-    def draw_texture(self, body, texture, *args, **kwargs):
+    def get_renderer(self, callback):
+        callback(self.renderer)
+
+    def draw_texture(self, texture, x, y, w, h, *args, **kwargs):
         SDL_RenderCopy(self.renderer, texture, None,
-                       SDL_Rect(int(body.pos.x), int(body.pos.y),
-                                int(body.w), int(body.h)))
+                       SDL_Rect(int(x), int(y), int(w), int(h)))
 
     def draw_rect(self, body, *args, **kwargs):
         SDL_SetRenderDrawColor(self.renderer, 255, 255, 255, 255)
