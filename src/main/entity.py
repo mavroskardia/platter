@@ -1,6 +1,6 @@
 class Entity:
 
-    def __init__(self, name, components=[]):
+    def __init__(self, name, components=None):
         self.name = name
         self.components = components
 

@@ -1,49 +1,6 @@
-import os
-
 from collections import OrderedDict
 from .constants import *
-
-# General
-
-title = 'On a Platter'
-resolution = (1280, 790)
-
-# Tiles
-
-tileset = os.path.join('resources', 'tilesets', 'default.set')
-tile_width = 32
-tile_height = 32
-
-# Sprites
-
-default_spriteset = os.path.join('resources', 'sprites', 'default.set')
-
-# Fonts
-
-hud_font = os.path.join('resources', 'fonts', 'aard.ttf')
-hud_font_size = 32
-
-# Constant Values
-
-gravity = 2.0
-air_friction_x = 0.95
-air_friction_y = 0.9
-base_friction = 0.99
-
-# Systems
-
-core_systems = SdlInitSystem, SdlWindowSystem, InputSystem,
-
-game_systems = ()  # Map,
-
-physical_systems = (Gravity, Force, CollisionDetection, PositionUpdate,
-                    PlayerInput,)
-
-debug_systems = BorderRenderer, Hud
-
-systems = core_systems + game_systems + physical_systems + debug_systems
-
-# Seeded Entities
+from .base import *
 
 entities = OrderedDict()
 

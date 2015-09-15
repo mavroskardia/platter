@@ -3,7 +3,7 @@ from itertools import combinations
 
 from . import system
 
-from ..config import config
+from .. import config
 from ..math.vector import Vec
 from ..components.physical import AffectedByGravity, Body, CanCollide
 

@@ -1,7 +1,7 @@
 from sdl2 import *
 
 from . import system
-from ..config import config
+from .. import config
 from ..math.vector import Vec
 from ..components.player import PlayerControl
 from ..components.physical import Body

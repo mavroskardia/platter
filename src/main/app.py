@@ -16,7 +16,7 @@ from itertools import combinations
 from .entity import Entity
 from .signaler import Signaler
 
-from ..config import config
+from .. import config
 from ..config.importer import load
 
 
@@ -37,7 +37,7 @@ class App:
     def add_entity(self, entity):
         combs, comps = [], list(sorted([type(c) for c in entity.components],
                                        key=lambda x: x.__name__))
-
+        print('adding {} with {}'.format(entity, comps))
         l = len(comps)
         while l > 0:
             combos = combinations(comps, l)
@@ -121,6 +121,7 @@ class App:
         self.signaler.register('keydown:D', self.debug)
         self.signaler.register('remove_component', self.remove_component)
         self.signaler.register('add_component', self.add_component)
+        self.signaler.register('add_entity', self.add_entity)
 
     def process_deferrals(self):
         '''
@@ -167,6 +168,22 @@ if __name__ == '__main__':
 
     if len(sys.argv) == 1:
         App().run()
+    elif sys.argv[1] == 'profile':
+        import cProfile
+        import io
+        import pstats
+        profile = cProfile.Profile()
+        profile.enable()
+        try:
+            App().run()
+        except:
+            pass
+        profile.disable()
+        sortby = 'cumulative'
+        with open('profile.log', 'w') as f:
+            ps = pstats.Stats(profile, stream=f).sort_stats(sortby)
+            ps.print_stats()
+
     else:
         def test_add_entity():
             class A:

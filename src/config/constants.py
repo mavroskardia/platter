@@ -1,3 +1,10 @@
+# Numeric constants
+
+gravity = 2.0
+air_friction_x = 0.95
+air_friction_y = 0.9
+base_friction = 0.99
+
 # Systems -- Core
 
 SdlInitSystem = '.systems.sdlcore.SdlInitSystem'
@@ -13,6 +20,7 @@ CollisionDetection = '.systems.physical.CollisionDetectionSystem'
 PositionUpdate = '.systems.physical.PositionUpdateSystem'
 PlayerInput = '.systems.player.PlayerInputSystem'
 Hud = '.systems.hud.HudSystem'
+Map = '.systems.map.MapSystem'
 
 # Systems -- Debugging
 

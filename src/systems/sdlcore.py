@@ -4,7 +4,7 @@ from sdl2 import *
 from sdl2.sdlttf import *
 
 from . import system
-from ..config import config
+from .. import config
 
 
 class SdlInitSystem(system.System):
@@ -68,9 +68,10 @@ class SdlWindowSystem(system.System):
         signaler.register('_internal:convert_surface_to_texture',
                           self.convert_surface_to_texture)
 
-    def draw_texture(self, position, size, texture, *args, **kwargs):
+    def draw_texture(self, body, texture, *args, **kwargs):
         SDL_RenderCopy(self.renderer, texture, None,
-                       SDL_Rect(position.x, position.y, size.w, size.h))
+                       SDL_Rect(int(body.pos.x), int(body.pos.y),
+                                int(body.w), int(body.h)))
 
     def draw_rect(self, body, *args, **kwargs):
         SDL_SetRenderDrawColor(self.renderer, 255, 255, 255, 255)
