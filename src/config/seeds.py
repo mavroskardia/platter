@@ -5,11 +5,11 @@ from .base import *
 entities = OrderedDict()
 
 entities['player'] = {
-    Bordered: None,
     AffectedByGravity: None,
     CanCollide: None,
     PlayerControl: None,
-    Body: (None, {'x': 100, 'y': 300, 'w': 50, 'h': 50, 'vx': 0, 'vy': 0,
+    Sprite: (('default',), {}),
+    Body: (None, {'x': 100, 'y': 300, 'w': 37, 'h': 64, 'vx': 0, 'vy': 0,
                   'nx': 0, 'ny': 0, 'fx': 0, 'fy': 0}),
 }
 

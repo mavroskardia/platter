@@ -86,8 +86,9 @@ class SdlWindowSystem(system.System):
         SDL_SetRenderDrawColor(self.renderer, 255, 255, 255, 255)
         SDL_RenderFillRect(self.renderer, r)
 
-    def convert_surface_to_texture(self, surface, callback):
-        callback(SDL_CreateTextureFromSurface(self.renderer, surface))
+    def convert_surface_to_texture(self, surface, callback, *args):
+        tex = SDL_CreateTextureFromSurface(self.renderer, surface)
+        callback(tex, surface.contents.w, surface.contents.h, *args)
 
     def draw_text(self, text, rect, *args, **kwargs):
         c = SDL_Color(255, 255, 255, 255)

@@ -43,5 +43,16 @@ class Body(Component):
     def higher_than(self, other):
         return self.pos.y + self.h >= other.pos.y
 
+    @property
+    def direction(self):
+        if self.vel.y < 0:
+            return 'up'
+        elif self.vel.y > 0:
+            return 'down'
+        elif self.vel.x < 0:
+            return 'left'
+        else:
+            return 'right'
+
     def as_rect(self):
         return Body.Rect(self.pos.x, self.pos.y, self.w, self.h)

@@ -6,7 +6,7 @@ resolution = (1280, 790)
 
 core = SdlInitSystem, SdlWindowSystem, InputSystem
 physical = Gravity, Force, CollisionDetection, PositionUpdate, PlayerInput
-game = Map,
+game = Map, SpriteSystem
 debug = BorderRenderer, Hud
 
 systems = core + physical + game + debug

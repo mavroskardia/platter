@@ -1,3 +1,5 @@
 import os
 
-default_spriteset = os.path.join('resources', 'sprites', 'default.set')
+spritesets = {
+    'default': os.path.join('resources', 'sprites', 'default.set'),
+}

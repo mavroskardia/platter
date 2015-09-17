@@ -1,6 +1,5 @@
 import sys
 import os
-import time
 
 try:
     os.environ['PYSDL2_DLL_PATH'] = 'lib'
@@ -15,37 +14,10 @@ from itertools import combinations
 
 from .entity import Entity
 from .signaler import Signaler
+from .fps import Fps
 
 from .. import config
 from ..config.importer import load
-
-
-class Fps:
-
-    UpdateInterval = 60
-
-    def __init__(self, signaler):
-        self.signaler = signaler
-        self.fps = 0
-        self.ticks = 0
-        self.current = 0
-        self.elapsed = 0
-
-    def init(self):
-        self.ticks = 0
-        self.last_time = time.time()
-
-    def tick_start(self):
-        self.current = time.time()
-        self.elapsed = self.current - self.last_time
-        self.fps = 1 / (self.elapsed + 0.00001)
-        self.ticks += 1
-
-    def tick_end(self):
-        self.last_time = self.current
-        if self.ticks == Fps.UpdateInterval:
-            self.ticks = 0
-            self.signaler.trigger('fps_update', self.fps)
 
 
 class App:
@@ -84,6 +56,7 @@ class App:
     def run(self):
 
         self.register_global_events()
+
         self.init_systems()
         self.init_entities()
         self.fps.init()

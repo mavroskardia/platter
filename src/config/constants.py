@@ -21,6 +21,7 @@ PositionUpdate = '.systems.physical.PositionUpdateSystem'
 PlayerInput = '.systems.player.PlayerInputSystem'
 Hud = '.systems.hud.HudSystem'
 Map = '.systems.map.MapSystem'
+SpriteSystem = '.systems.sprite.SpriteSystem'
 
 # Systems -- Debugging
 
@@ -33,6 +34,7 @@ CanCollide = '.components.physical.CanCollide'
 PlayerControl = '.components.player.PlayerControl'
 Body = '.components.physical.Body'
 Text = '.components.hud.Text'
+Sprite = '.components.sprite.Sprite'
 
 # Components -- Debugging
 

@@ -1,4 +1,4 @@
-[top]
+[up]
 1=chryso/n1.png
 2=chryso/n2.png
 3=chryso/n3.png
@@ -10,7 +10,7 @@
 3=chryso/e3.png
 4=chryso/e4.png
 
-[bottom]
+[down]
 1=chryso/s1.png
 2=chryso/s2.png
 3=chryso/s3.png

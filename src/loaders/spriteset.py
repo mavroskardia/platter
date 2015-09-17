@@ -1,8 +1,20 @@
+import os
+
+from sdl2.sdlimage import IMG_Load
+
 from configparser import ConfigParser
 from collections import defaultdict
 
-from ..config import config
+from .. import config
 from ..main.signaler import Signaler
+
+
+class SpriteData:
+
+    def __init__(self, tex, w, h):
+        self.tex = tex
+        self.w = w
+        self.h = h
 
 
 class SpritesetLoader:
@@ -16,16 +28,19 @@ class SpritesetLoader:
 
         spriteset = defaultdict(list)
 
-        for direction in parsed_spriteset.sections():
-            frames = parsed_spriteset[direction]
+        for section_name in parsed_spriteset.sections():
+            frames = parsed_spriteset[section_name]
 
-            def add_to_spriteset(texture):
-                spriteset[direction].append(texture)
+            def add_to_spriteset(texture, w, h):
+                sd = SpriteData(texture, w, h)
+                spriteset[section_name].append(sd)
 
             for frame in frames:
-                imgfile = frames[frame].encode()
-                signaler.trigger('_internal:convert_surface_to_texture',
-                                 IMG_Load(imgfile), add_to_spriteset)
+                imgfile = os.path.join(os.path.dirname(filename),
+                                       frames[frame]).encode()
+
+                self.signaler.trigger('_internal:convert_surface_to_texture',
+                                      IMG_Load(imgfile), add_to_spriteset)
 
         return spriteset
 

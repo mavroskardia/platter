@@ -27,7 +27,7 @@ class MapLoader:
             data = config[tilename]
             can_walk = data['walk'].lower() == 'true'
 
-            def add(tex):
+            def add(tex, w, h):
                 tiles[tilename] = TileData(tilename, tex, can_walk)
 
             imgfile = data['file'].encode()
