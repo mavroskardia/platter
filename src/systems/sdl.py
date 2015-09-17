@@ -3,34 +3,20 @@ import atexit
 from sdl2 import *
 from sdl2.sdlttf import *
 
-from . import system
+from .system import System
 from .. import config
 
 
-class SdlInitSystem(system.System):
+class SdlSystem(System):
 
     def init(self, signaler):
         atexit.register(SDL_Quit)
 
         err = SDL_Init(SDL_INIT_EVERYTHING)
-
-        if err != 0:
-            raise Exception(SDL_GetError())
-
-    def process(self, *args, signaler=None, entities=None, elapsed=0, **kargs):
-        SDL_Delay(5)
-
-
-class SdlWindowSystem(system.System):
-
-    def init(self, signaler):
-        err = SDL_VideoInit(None)
-
         if err != 0:
             raise Exception(SDL_GetError())
 
         err = TTF_Init()
-
         if err != 0:
             raise Exception(TTF_GetError())
 
@@ -59,6 +45,7 @@ class SdlWindowSystem(system.System):
     def process(self, *args, signaler=None, entities=None, elapsed=0, **kargs):
         SDL_RenderPresent(self.renderer)
         self.clear()
+        SDL_Delay(5)
 
     def register_events(self, signaler):
         signaler.register('get_renderer', self.get_renderer)

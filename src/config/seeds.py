@@ -16,8 +16,8 @@ entities['player'] = {
 entities['ground'] = {
     Bordered: None,
     CanCollide: None,
-    Body: (None, {'x': 0, 'y': resolution[1] - 50, 'w': resolution[0],
-                  'h': 50, 'vx': 0, 'vy': 0, 'nx': 0, 'ny': -gravity,
+    Body: (None, {'x': -5, 'y': resolution[1] - 50, 'w': resolution[0]+15,
+                  'h': 55, 'vx': 0, 'vy': 0, 'nx': 0, 'ny': -gravity,
                   'fx': base_friction, 'fy': 1.0}),
 }
 

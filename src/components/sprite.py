@@ -9,7 +9,4 @@ class Sprite(Component):
         self.frame = 0
         self.maxframes = 0
         self.span = 0.0
-
-    @property
-    def interval(self):
-        return 1.0 / self.maxframes
+        self.interval = 0.0

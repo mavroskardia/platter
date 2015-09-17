@@ -26,6 +26,9 @@ class SpriteSystem(System):
             rect = Body.Rect(body.pos.x, body.pos.y, data.w, data.h)
             signaler.trigger('draw:texture', data.tex, rect)
 
+            if not body.moving:
+                continue
+
             sprite.span += elapsed
             if sprite.span > sprite.interval:
                 sprite.frame += 1
@@ -36,9 +39,12 @@ class SpriteSystem(System):
 
     def load_spriteset(self, signaler, spriteset, sprite):
         print('loading spriteset', spriteset)
+
         loader = SpritesetLoader(signaler)
         ss = loader.load(config.spritesets[spriteset])
+
         sprite.maxframes = max([len(f) for f in ss.values()])
+        sprite.interval = 1.0 / sprite.maxframes
 
         self.spritesets[spriteset] = ss
         return ss

@@ -7,9 +7,8 @@ base_friction = 0.99
 
 # Systems -- Core
 
-SdlInitSystem = '.systems.sdlcore.SdlInitSystem'
-SdlWindowSystem = '.systems.sdlcore.SdlWindowSystem'
-InputSystem = '.systems.input.InputSystem'
+Sdl = '.systems.sdl.SdlSystem'
+Input = '.systems.input.InputSystem'
 
 # Systems -- Physical
 
