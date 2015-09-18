@@ -4,6 +4,7 @@ import os
 try:
     os.environ['PYSDL2_DLL_PATH'] = 'lib'
     from sdl2 import *
+    from sdl2.sdlttf import *
 except ImportError:
     print('You have to have pysdl2 installed and'
           ' the sdl2 dlls in the lib directory')
@@ -18,6 +19,44 @@ from .fps import Fps
 
 from .. import config
 from ..config.importer import load
+
+
+class TitleApp:
+
+    def __init__(self, signaler):
+        self.signaler = signaler
+
+        def set_renderer(renderer):
+            self.renderer = renderer
+
+        self.signaler.trigger('get_renderer', set_renderer)
+
+    def run(self):
+
+        font = TTF_OpenFont(config.title_font.encode(), config.title_font_size)
+
+        ts = TTF_RenderUTF8_Blended(font, 'Platterman'.encode(),
+                                    SDL_Color(255, 255, 255, 255))
+
+        title = SDL_CreateTextureFromSurface(self.renderer, ts)
+        title_rect = SDL_Rect(100, 100, ts.contents.w, ts.contents.h)
+
+        while True:
+
+            evt = SDL_Event()
+            while SDL_PollEvent(evt):
+                if evt.type == SDL_QUIT:
+                    return False
+                elif evt.type == SDL_KEYDOWN:
+                    if evt.key.keysym.scancode == SDL_SCANCODE_RETURN:
+                        return True
+
+            SDL_RenderCopy(self.renderer, title, None, title_rect)
+            SDL_RenderPresent(self.renderer)
+            SDL_SetRenderDrawColor(self.renderer, 0, 0, 0, 255)
+            SDL_RenderClear(self.renderer)
+
+        return False
 
 
 class App:
@@ -56,10 +95,13 @@ class App:
     def run(self):
 
         self.register_global_events()
-
         self.init_systems()
         self.init_entities()
         self.fps.init()
+
+        hit_play_on_title = TitleApp(self.signaler).run()
+        if not hit_play_on_title:
+            return
 
         self.running = True
 

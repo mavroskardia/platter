@@ -1,5 +1,5 @@
 [base]
-file = resources/tiles/grass.png
+file = resources/tiles/brick.png
 walk = True
 
 [grass]

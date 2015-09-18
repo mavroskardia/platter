@@ -20,6 +20,9 @@ class GravitySystem(system.System):
     def process(self, *args, signaler, components, elapsed, **kwargs):
         for abg, body in components:
             body.acc += self.g
+            if body.colliding_with:
+                for collider in body.colliding_with:
+                    body.acc += collider.norm
 
 
 class ForceSystem(system.System):
@@ -34,10 +37,10 @@ class ForceSystem(system.System):
     def process(self, *args, signaler, components, elapsed, **kwargs):
         for body, in components:
             body.vel += body.acc
-            if body.colliding_with:
-                if body.higher_than(body.colliding_with[0]):
-                    f = body.colliding_with[0].friction
-                    body.vel *= f
+            for ob in body.colliding_with:
+                if body.higher_than(ob):
+                    body.vel.x /= ob.friction.x
+                    body.vel.y /= ob.friction.y
                     continue
             body.vel *= self.air_friction
 
@@ -68,14 +71,14 @@ class CollisionDetectionSystem(system.System):
                           w=otherbody.w, h=otherbody.h)
 
                 if self.arecolliding(b1, b2):
-                    body.vel = copy(otherbody.vel)
-                    body.acc = copy(otherbody.norm)
-                    body.colliding_with.append(otherbody)
+                    # body.vel = copy(otherbody.vel)
+                    # body.acc = copy(otherbody.norm)
+                    body.colliding_with.add(otherbody)
                     body.jumping = False
                 else:
                     try:
                         body.colliding_with.remove(otherbody)
-                    except ValueError:  # safely ignore non-existent value
+                    except KeyError:  # safely ignore non-existent value
                         pass
 
     def arecolliding(self, b1, b2):
@@ -83,18 +86,6 @@ class CollisionDetectionSystem(system.System):
                 b1.pos.x + b1.w > b2.pos.x and
                 b1.pos.y < b2.pos.y + b2.h and
                 b1.pos.y + b1.h > b2.pos.y)
-
-
-class NormalUpdateSystem(system.System):
-    '''
-        Re-calculates normals. Not using this unless I add rotations
-    '''
-
-    componenttypes = Body,
-
-    def process(self, *args, signaler, components, elapsed, **kwargs):
-        for body, in components:
-            body.ny = -config.gravity
 
 
 class PositionUpdateSystem(system.System):

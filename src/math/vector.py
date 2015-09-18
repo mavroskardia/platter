@@ -26,6 +26,20 @@ class Vec:
         self.y -= v.y
         return self
 
+    def __div__(self, v):
+        if isinstance(v, Vec):
+            return Vec(self.x / v.x, self.y / v.y)
+        return Vec(self.x / v, self.y / v)
+
+    def __idiv__(self, v):
+        if isinstance(v, Vec):
+            self.x /= v.x
+            self.y /= v.y
+        else:
+            self.x /= v
+            self.y /= v
+        return self
+
     def __mul__(self, v):
         if isinstance(v, Vec):
             return Vec(self.x * v.x, self.y * v.y)

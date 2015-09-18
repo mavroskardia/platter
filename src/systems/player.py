@@ -37,3 +37,5 @@ class PlayerInputSystem(system.System):
                 if not body.jumping:
                     body.acc += self.jump_force
                     body.jumping = True
+
+            signaler.trigger('player_update', body)

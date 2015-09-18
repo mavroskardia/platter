@@ -10,7 +10,7 @@ entities['player'] = {
     PlayerControl: None,
     Sprite: (('default',), {}),
     Body: (None, {'x': 100, 'y': 300, 'w': 37, 'h': 64, 'vx': 0, 'vy': 0,
-                  'nx': 0, 'ny': 0, 'fx': 0, 'fy': 0}),
+                  'nx': 0, 'ny': 0, 'fx': 1.0, 'fy': 1.0}),
 }
 
 entities['ground'] = {
@@ -18,7 +18,7 @@ entities['ground'] = {
     CanCollide: None,
     Body: (None, {'x': -5, 'y': resolution[1] - 50, 'w': resolution[0]+15,
                   'h': 55, 'vx': 0, 'vy': 0, 'nx': 0, 'ny': -gravity,
-                  'fx': base_friction, 'fy': 1.0}),
+                  'fx': 1.0, 'fy': gravity}),
 }
 
 entities['platform'] = {
@@ -26,7 +26,7 @@ entities['platform'] = {
     CanCollide: None,
     Body: (None, {'x': 100, 'y': 500, 'w': 200, 'h': 50, 'vx': 0, 'vy': 0,
                   'nx': -10.0, 'ny': -gravity,
-                  'fx': base_friction, 'fy': 1.0}),
+                  'fx': 1.0, 'fy': 1.0}),
 }
 
 entities['obstacle'] = {
@@ -34,7 +34,7 @@ entities['obstacle'] = {
     CanCollide: None,
     Body: (None, {'x': 400, 'y': 690, 'w': 200, 'h': 50, 'vx': 0, 'vy': 0,
                   'nx': -10.0, 'ny': -gravity,
-                  'fx': base_friction, 'fy': 1.0}),
+                  'fx': 1.0, 'fy': 1.0}),
 }
 
 entities['collider1'] = {
@@ -51,7 +51,7 @@ entities['collider2'] = {
                   'ax': -10.0, 'ay': 0, 'nx': 0.0, 'ny': 0.0})
 }
 
-entities['testtext'] = {
-    Text: (('Hello, World!',), None),
-    Body: (None, {'x': 700, 'y': 10, 'w': 500, 'h': 20})
-}
+# entities['testtext'] = {
+#     Text: (('Hello, World!',), None),
+#     Body: (None, {'x': 700, 'y': 10, 'w': 500, 'h': 20})
+# }

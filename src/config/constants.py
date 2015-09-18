@@ -3,7 +3,7 @@
 gravity = 2.0
 air_friction_x = 0.95
 air_friction_y = 0.9
-base_friction = 0.99
+base_friction = 0.01
 
 # Systems -- Core
 

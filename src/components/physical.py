@@ -25,7 +25,7 @@ class Body(Component):
         self.friction = Vec(kwargs.get('fx', 0.0), kwargs.get('fy', 0.0))
         self.w, self.h = kwargs.get('w', 10), kwargs.get('h', 10)
         self.mass = kwargs.get('mass', 1.0)
-        self.colliding_with = []
+        self.colliding_with = set()
         self.jumping = False
 
     def __str__(self):
@@ -49,10 +49,10 @@ class Body(Component):
             return 'up'
         elif self.vel.y > 0:
             return 'down'
-        elif self.vel.x < 0:
-            return 'left'
-        else:
+        elif self.vel.x > 0:
             return 'right'
+        else:
+            return 'left'
 
     def as_rect(self):
         return Body.Rect(self.pos.x, self.pos.y, self.w, self.h)
