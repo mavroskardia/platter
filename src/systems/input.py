@@ -1,10 +1,10 @@
 import sys
 from sdl2 import *
 
-from . import system
+from .system import System
 
 
-class InputSystem(system.System):
+class InputSystem(System):
 
     def process(self, *args, signaler=None, entities=None, elapsed=0, **kargs):
         evt = SDL_Event()

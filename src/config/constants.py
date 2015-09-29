@@ -12,6 +12,7 @@ Input = '.systems.input.InputSystem'
 
 # Systems -- Physical
 
+Physics = '.systems.physical.PhysicsSystem'
 Gravity = '.systems.physical.GravitySystem'
 Jumping = '.systems.physical.JumpingSystem'
 Force = '.systems.physical.ForceSystem'
@@ -30,6 +31,7 @@ BorderRenderer = '.systems.decorations.BorderRendererSystem'
 Acceleration = '.components.physical.Acceleration'
 AffectedByGravity = '.components.physical.AffectedByGravity'
 CanCollide = '.components.physical.CanCollide'
+HasPhysics = '.components.physical.HasPhysics'
 PlayerControl = '.components.player.PlayerControl'
 Body = '.components.physical.Body'
 Text = '.components.hud.Text'

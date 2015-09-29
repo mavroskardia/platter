@@ -4,9 +4,10 @@ from .constants import *
 title = 'On a Platter'
 resolution = (1280, 790)
 
-core = Sdl, Input
-physical = PlayerInput, Gravity, Force, CollisionDetection, PositionUpdate
+sdl = Sdl, Input
+# physical = PlayerInput, Gravity, Force, CollisionDetection, PositionUpdate
+physical = PlayerInput, Physics, PositionUpdate
 game = Map, SpriteSystem
 debug = BorderRenderer, Hud
 
-systems = core + physical + game + debug
+systems = sdl + physical + game + debug

@@ -5,7 +5,8 @@ from .system import System
 
 from .. import config
 from ..math.vector import Vec, dot
-from ..components.physical import AffectedByGravity, Body, CanCollide
+from ..components.physical import (AffectedByGravity, Body, CanCollide,
+                                   HasPhysics)
 
 
 class GravitySystem(System):
@@ -18,13 +19,11 @@ class GravitySystem(System):
     g = Vec(0, config.gravity)
 
     def process(self, *args, signaler, components, elapsed, **kwargs):
+        return
+
         for abg, body in components:
-            body.acc += self.g
-            if body.colliding_with:
-                for collider in body.colliding_with:
-                    # this will counter _current_ gravity, but do nothing for
-                    # the acceleration gathered in the meantime...
-                    body.acc += collider.norm
+            if not body.colliding:
+                body.vel += self.g
 
 
 class ForceSystem(System):
@@ -37,14 +36,15 @@ class ForceSystem(System):
     air_friction = Vec(config.air_friction_x, config.air_friction_y)
 
     def process(self, *args, signaler, components, elapsed, **kwargs):
+        return
         for body, in components:
-            body.vel += body.acc
+            # body.vel += body.acc
             body.vel *= self.air_friction
 
 
-class CollisionDetectionSystem(System):
+class PhysicsSystem(System):
 
-    componenttypes = Body, CanCollide
+    componenttypes = Body, CanCollide, HasPhysics
 
     class Manifold:
 
@@ -84,35 +84,40 @@ class CollisionDetectionSystem(System):
         if len(components) < 2:
             return
 
-        for body, _ in components:
-            for otherbody, __ in components:
+        for (body, r, rr), (otherbody, s, ss) in combinations(components, 2):
+            if body.inv_mass == 0 and otherbody.inv_mass == 0:
+                continue
 
-                if body == otherbody:
-                    continue
+            a = copy(body)
+            a.x = body.pos.x + body.vel.x * elapsed
+            a.y = body.pos.y + body.vel.y * elapsed
 
-                a = copy(body)
-                # a.x = body.pos.x + body.vel.x * elapsed
-                # a.y = body.pos.y + body.vel.y * elapsed
+            b = copy(otherbody)
+            b.x = otherbody.pos.x + otherbody.vel.x * elapsed
+            b.y = otherbody.pos.y + otherbody.vel.y * elapsed
 
-                b = copy(otherbody)
-                # b.x = otherbody.pos.x + otherbody.vel.x * elapsed
-                # b.y = otherbody.pos.y + otherbody.vel.y * elapsed
+            colliding, manifold = self.aabb_vs_aabb(a, b)
 
-                colliding, manifold = self.aabb_vs_aabb(a, b)
+            if colliding:
+                rel_vel = b.vel - a.vel
+                vel_norm = dot(rel_vel, manifold.n)
 
-                if colliding:
-                    rel_vel = b.vel - a.vel
-                    vel_norm = dot(rel_vel, manifold.n)
+                if vel_norm > 0.0:  # moving away from each other
+                    return
 
-                    if vel_norm > 0.0:
-                        return
+                e = min(a.restitution, b.restitution)
+                j = -(1 + e) * vel_norm
+                j /= a.inv_mass + b.inv_mass
+                impulse = j * manifold.n
 
-                    e = min(body.restitution, otherbody.restitution)
-                    j = -(1 + e) * vel_norm
-                    j /= a.inv_mass + b.inv_mass
-                    impulse = j * manifold.n
-                    body.vel = body.vel - body.inv_mass * impulse
-                    otherbody.vel = otherbody.vel + otherbody.inv_mass * impulse
+                body.vel = a.vel - a.inv_mass * impulse
+                otherbody.vel = b.vel + b.inv_mass * impulse
+
+                body.colliding = True
+                otherbody.colliding = True
+            else:
+                body.colliding = False
+                otherbody.colliding = False
 
 
 class CollisionDetectionSystem0(System):

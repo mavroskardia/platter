@@ -5,6 +5,10 @@ from ..math.vector import Vec
 from .component import Component
 
 
+class HasPhysics(Component):
+    pass
+
+
 class CanCollide(Component):
     pass
 
@@ -23,17 +27,17 @@ class Body(Component):
             self.max = Vec(x2, y2)
 
     def __copy__(self):
-        b = Body
+        b = Body(self.entity)
         b.pos = copy(self.pos)
         b.vel = copy(self.vel)
         b.norm = copy(self.norm)
         b.acc = copy(self.acc)
         b.friction = copy(self.friction)
-        b.restitution = copy(self.restitution)
-        b.w = copy(self.w)
-        b.h = copy(self.h)
-        b.mass = copy(self.mass)
-        b.inv_mass = copy(self.inv_mass)
+        b.restitution = self.restitution
+        b.w = self.w
+        b.h = self.h
+        b.mass = self.mass
+        b.inv_mass = self.inv_mass
         return b
 
     def __init__(self, entity, *args, **kwargs):
@@ -48,6 +52,7 @@ class Body(Component):
         self.mass = kwargs.get('mass', 1.0)
         self.inv_mass = 0 if self.mass == 0 else 1 / self.mass
         self.colliding_with = set()
+        self.colliding = False
         self.jumping = False
 
     def __str__(self):
