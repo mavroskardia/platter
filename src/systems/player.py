@@ -35,6 +35,7 @@ class PlayerInputSystem(system.System):
             if self.initiate_jump:
                 self.initiate_jump = False
                 if not body.jumping:
+                    print('jump')
                     body.acc += self.jump_force
                     body.jumping = True
 

@@ -45,6 +45,11 @@ class Vec:
             return Vec(self.x * v.x, self.y * v.y)
         return Vec(self.x * v, self.y * v)
 
+    def __rmul__(self, v):
+        if isinstance(v, Vec):
+            return Vec(self.x * v.x, self.y * v.y)
+        return Vec(self.x * v, self.y * v)
+
     def __imul__(self, v):
         if isinstance(v, Vec):
             self.x *= v.x
@@ -63,15 +68,18 @@ class Vec:
     def __str__(self):
         return '<{s.x}, {s.y}>'.format(s=self)
 
+    def __repr__(self):
+        return 'Vector: <{s.x}, {s.y}>'.format(s=self)
+
     def __copy__(self):
         return Vec(self.x, self.y)
 
 
-def dot(self, v1, v2):
+def dot(v1, v2):
     return v1.x * v2.x + v1.y * v2.y
 
 
-def norm(self, v):
+def norm(v):
     return math.sqrt(v.x * v.x + v.y * v.y)
 
 

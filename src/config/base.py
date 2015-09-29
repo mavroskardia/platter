@@ -5,7 +5,7 @@ title = 'On a Platter'
 resolution = (1280, 790)
 
 core = Sdl, Input
-physical = Gravity, Force, CollisionDetection, PositionUpdate, PlayerInput
+physical = PlayerInput, Gravity, Force, CollisionDetection, PositionUpdate
 game = Map, SpriteSystem
 debug = BorderRenderer, Hud
 
