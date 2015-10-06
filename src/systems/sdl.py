@@ -5,11 +5,12 @@ from sdl2.sdlttf import *
 
 from .system import System
 from .. import config
+from .. import signaler
 
 
 class SdlSystem(System):
 
-    def init(self, signaler):
+    def init(self):
         atexit.register(SDL_Quit)
 
         err = SDL_Init(SDL_INIT_EVERYTHING)
@@ -35,26 +36,27 @@ class SdlSystem(System):
         if not self.font:
             raise Exception(TTF_GetError())
 
-        self.register_events(signaler)
+        self.register_events()
         self.clear()
 
     def clear(self):
         SDL_SetRenderDrawColor(self.renderer, 0, 0, 0, 255)
         SDL_RenderClear(self.renderer)
 
-    def process(self, *args, signaler=None, entities=None, elapsed=0, **kargs):
+    def process(self, *args, entities=None, elapsed=0, **kargs):
         SDL_RenderPresent(self.renderer)
         self.clear()
         SDL_Delay(5)
 
-    def register_events(self, signaler):
-        signaler.register('get_renderer', self.get_renderer)
-        signaler.register('draw:rect', self.draw_rect)
-        signaler.register('draw:filledrect', self.draw_filled_rect)
-        signaler.register('draw:texture', self.draw_texture)
-        signaler.register('draw:text', self.draw_text)
-        signaler.register('_internal:convert_surface_to_texture',
-                          self.convert_surface_to_texture)
+    def register_events(self):
+        s = signaler.instance
+        s.register('get_renderer', self.get_renderer)
+        s.register('draw:rect', self.draw_rect)
+        s.register('draw:filledrect', self.draw_filled_rect)
+        s.register('draw:texture', self.draw_texture)
+        s.register('draw:text', self.draw_text)
+        s.register('_internal:convert_surface_to_texture',
+                   self.convert_surface_to_texture)
 
     def get_renderer(self, callback):
         callback(self.renderer)

@@ -2,7 +2,7 @@ class Entity:
 
     def __init__(self, name, components=None):
         self.name = name
-        self.components = components
+        self.components = components or []
 
     def __str__(self):
         return self.name

@@ -2,8 +2,8 @@ class System:
 
     componenttypes = None
 
-    def init(self, signaler):
+    def init(self):
         pass
 
-    def process(self, *a, signaler=None, components=None, elapsed=0, **kw):
+    def process(self, *a, components=None, elapsed=0, **kw):
         pass

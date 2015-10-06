@@ -18,7 +18,7 @@ class GravitySystem(System):
 
     g = Vec(0, config.gravity)
 
-    def process(self, *args, signaler, components, elapsed, **kwargs):
+    def process(self, *args, components, elapsed, **kwargs):
         return
 
         for abg, body in components:
@@ -35,7 +35,7 @@ class ForceSystem(System):
 
     air_friction = Vec(config.air_friction_x, config.air_friction_y)
 
-    def process(self, *args, signaler, components, elapsed, **kwargs):
+    def process(self, *args, components, elapsed, **kwargs):
         return
         for body, in components:
             # body.vel += body.acc
@@ -79,7 +79,7 @@ class PhysicsSystem(System):
 
         return False, manifold
 
-    def process(self, *args, signaler, components, elapsed, **kwargs):
+    def process(self, *args, components, elapsed, **kwargs):
 
         if len(components) < 2:
             return
@@ -124,7 +124,7 @@ class CollisionDetectionSystem0(System):
 
     componenttypes = Body, CanCollide
 
-    def process(self, *args, signaler, components, elapsed, **kwargs):
+    def process(self, *args, components, elapsed, **kwargs):
 
         if len(components) < 2:
             return
@@ -171,6 +171,6 @@ class PositionUpdateSystem(System):
 
     componenttypes = Body,
 
-    def process(s, *args, signaler=None, components=None, elapsed=0, **kargs):
+    def process(s, *args, components=None, elapsed=0, **kargs):
         for body, in components:
             body.pos += body.vel * elapsed
