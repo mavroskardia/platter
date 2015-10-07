@@ -81,9 +81,6 @@ class PhysicsSystem(System):
 
     def process(self, *args, components, elapsed, **kwargs):
 
-        if len(components) < 2:
-            return
-
         for (body, r, rr), (otherbody, s, ss) in combinations(components, 2):
             if body.inv_mass == 0 and otherbody.inv_mass == 0:
                 continue
@@ -103,7 +100,7 @@ class PhysicsSystem(System):
                 vel_norm = dot(rel_vel, manifold.n)
 
                 if vel_norm > 0.0:  # moving away from each other
-                    return
+                    continue
 
                 e = min(a.restitution, b.restitution)
                 j = -(1 + e) * vel_norm
@@ -116,8 +113,13 @@ class PhysicsSystem(System):
                 body.colliding = True
                 otherbody.colliding = True
             else:
-                body.colliding = False
-                otherbody.colliding = False
+                body.colliding, otherbody.colliding = False, False
+                body, otherbody = a, b
+
+        for body, _, __ in components:
+
+            if not body.colliding:
+                body.pos += body.vel * elapsed
 
 
 class CollisionDetectionSystem0(System):

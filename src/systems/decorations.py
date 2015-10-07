@@ -1,9 +1,9 @@
-from . import system
+from .system import System
 from ..components.decoration import Bordered
 from ..components.physical import Body
 
 
-class BorderRendererSystem(system.System):
+class BorderRendererSystem(System):
 
     componenttypes = Body, Bordered
 
