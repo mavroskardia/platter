@@ -6,14 +6,13 @@ from .component import Component
 
 
 class HasPhysics(Component):
-    pass
+    def __init__(self, entity, static=False, affected_by_gravity=True):
+        super().__init__(entity)
+        self.static = static
+        self.affected_by_gravity = affected_by_gravity
 
 
 class CanCollide(Component):
-    pass
-
-
-class AffectedByGravity(Component):
     pass
 
 
@@ -21,39 +20,61 @@ class Body(Component):
 
     Rect = namedtuple('Rect', ('x', 'y', 'w', 'h'))
 
-    class MinMax:
-        def __init__(self, x1, y1, x2, y2):
-            self.min = Vec(x1, y1)
-            self.max = Vec(x2, y2)
-
-    def __copy__(self):
-        b = Body(self.entity)
-        b.pos = copy(self.pos)
-        b.vel = copy(self.vel)
-        b.norm = copy(self.norm)
-        b.acc = copy(self.acc)
-        b.friction = copy(self.friction)
-        b.restitution = self.restitution
-        b.w = self.w
-        b.h = self.h
-        b.mass = self.mass
-        b.inv_mass = self.inv_mass
-        return b
-
     def __init__(self, entity, *args, **kwargs):
         super().__init__(entity, *args, **kwargs)
-        self.pos = Vec(kwargs.get('x', 0.0), kwargs.get('y', 0.0))
-        self.vel = Vec(kwargs.get('vx', 0.0), kwargs.get('vy', 0.0))
-        self.norm = Vec(kwargs.get('nx', 0.0), kwargs.get('ny', 0.0))
-        self.acc = Vec(kwargs.get('ax', 0.0), kwargs.get('ay', 0.0))
-        self.friction = Vec(kwargs.get('fx', 0.0), kwargs.get('fy', 0.0))
-        self.restitution = kwargs.get('r', 10.0)
-        self.w, self.h = kwargs.get('w', 10), kwargs.get('h', 10)
-        self.mass = kwargs.get('mass', 1.0)
-        self.inv_mass = 0 if self.mass == 0 else 1 / self.mass
-        self.colliding_with = set()
-        self.colliding = False
-        self.jumping = False
+
+        # center position
+        self.pos = Vec(kwargs.pop('x', 0.0), kwargs.pop('y', 0.0))
+        # dimensions
+        self.w, self.h = kwargs.pop('w', 10), kwargs.pop('h', 10)
+        # velocity
+        self.vel = Vec(kwargs.pop('vx', 0.0), kwargs.pop('vy', 0.0))
+
+        # frictions
+        self.static_friction = kwargs.pop('sf', 1.0)
+        self.dynamic_friction = kwargs.pop('df', 0.3)
+
+        # restitution
+        self.restitution = kwargs.pop('r', 0.1)
+
+        # inverse mass
+        mass = kwargs.pop('mass', 1.0)
+        self.im = 0 if mass == 0 else 1 / mass
+
+        # calculation vars
+        self.force = Vec(0, 0)
+        self.update_bounds()
+
+    def integrate_forces(self, f):
+        if self.im != 0:
+            self.vel += 0.5 * (self.force * self.im + f)
+
+    def integrate_velocities(self, v):
+        if self.im != 0:
+            self.pos += self.vel
+            self.integrate_forces(v)
+
+    def apply_impulse(self, i):
+        self.vel += self.im * i
+
+    def apply_force(self, f):
+        self.force += f
+
+    def clear_forces(self):
+        self.force = Vec(0, 0)
+
+    def update_bounds(self):
+        self.min = self.pos - Vec(self.w / 2, self.h / 2)
+        self.max = self.pos + Vec(self.w / 2, self.h / 2)
+
+    def is_overlapping(self, other):
+        if self.max.x < other.min.x or self.min.x > other.max.x:
+            return False
+
+        if self.max.y < other.min.y or self.min.y > other.max.y:
+            return False
+
+        return True
 
     def __str__(self):
         return '''Body for {s.entity.name}:
@@ -82,8 +103,5 @@ class Body(Component):
             return 'left'
 
     def as_rect(self):
-        return Body.Rect(self.pos.x, self.pos.y, self.w, self.h)
-
-    def as_minmax(self):
-        return Body.MinMax(self.pos.x, self.pos.y,
-                           self.pos.x + self.w, self.pos.y + self.h)
+        return Body.Rect(self.pos.x-self.w / 2, self.pos.y-self.h / 2,
+                         self.w, self.h)

@@ -8,6 +8,6 @@ sdl = Sdl, Input
 # physical = PlayerInput, Gravity, Force, CollisionDetection, PositionUpdate
 physical = PlayerInput, Physics, PositionUpdate
 game = Map, SpriteSystem
-debug = BorderRenderer, Hud
+debug = BorderRenderer,  # Hud
 
 systems = sdl + physical + game + debug

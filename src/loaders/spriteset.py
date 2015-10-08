@@ -6,7 +6,7 @@ from configparser import ConfigParser
 from collections import defaultdict
 
 from .. import config
-from ..main.signaler import Signaler
+from .. import signaler
 
 
 class SpriteData:
@@ -18,9 +18,6 @@ class SpriteData:
 
 
 class SpritesetLoader:
-
-    def __init__(self, signaler):
-        self.signaler = signaler
 
     def load(self, filename):
         parsed_spriteset = ConfigParser()
@@ -39,8 +36,9 @@ class SpritesetLoader:
                 imgfile = os.path.join(os.path.dirname(filename),
                                        frames[frame]).encode()
 
-                self.signaler.trigger('_internal:convert_surface_to_texture',
-                                      IMG_Load(imgfile), add_to_spriteset)
+                signaler.instance.trigger(
+                    '_internal:convert_surface_to_texture',
+                    IMG_Load(imgfile), add_to_spriteset)
 
         return spriteset
 
@@ -57,8 +55,7 @@ if __name__ == '__main__':
         print('called convert for', surface)
         cb(surface)
 
-    signaler = Signaler()
-    signaler.register('_internal:convert_surface_to_texture', f)
+    signaler.instance.register('_internal:convert_surface_to_texture', f)
 
-    ssl = SpritesetLoader(signaler)
+    ssl = SpritesetLoader()
     spriteset = ssl.load(config.default_spriteset)

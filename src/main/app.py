@@ -10,22 +10,20 @@ except ImportError:
           ' the sdl2 dlls in the lib directory')
     sys.exit(1)
 
-from .signaler import Signaler
 from .fps import Fps
 from .ecs import EntityComponentSystemManager
 
+from .. import signaler
 from .. import config
 
 
 class TitleApp:
 
-    def __init__(self, signaler):
-        self.signaler = signaler
-
+    def __init__(self):
         def set_renderer(renderer):
             self.renderer = renderer
 
-        self.signaler.trigger('get_renderer', set_renderer)
+        signaler.instance.trigger('get_renderer', set_renderer)
 
     def run(self):
 
@@ -58,9 +56,8 @@ class TitleApp:
 class App:
 
     def __init__(self):
-        self.signaler = Signaler()
-        self.ecs = EntityComponentSystemManager(self.signaler)
-        self.fps = Fps(self.signaler)
+        self.ecs = EntityComponentSystemManager()
+        self.fps = Fps()
 
     def run(self):
 
@@ -69,7 +66,7 @@ class App:
 
         self.ecs.init_systems()
 
-        hit_play_on_title = TitleApp(self.signaler).run()
+        hit_play_on_title = TitleApp().run()
         if not hit_play_on_title:
             return
 
@@ -83,12 +80,12 @@ class App:
             self.fps.tick_end()
 
     def register_global_events(self):
-        self.signaler.register('add_entity', self.ecs.add_entity)
-        self.signaler.register('quit', self.quit)
-        self.signaler.register('keydown:Escape', self.quit)
-        self.signaler.register('keydown:D', self.debug)
-        self.signaler.register('remove_component', self.ecs.remove_component)
-        self.signaler.register('add_component', self.ecs.add_component)
+        signaler.instance.register('add_entity', self.ecs.add_entity)
+        signaler.instance.register('quit', self.quit)
+        signaler.instance.register('keydown:Escape', self.quit)
+        signaler.instance.register('keydown:D', self.debug)
+        signaler.instance.register('remove_component', self.ecs.remove_component)
+        signaler.instance.register('add_component', self.ecs.add_component)
 
     def quit(self):
         self.running = False

@@ -21,7 +21,7 @@ class EntityComponentSystemManager:
         for system in config.systems:
             s = load(system)()
             print('initializing', s)
-            s.init(self.signaler)
+            s.init()
             self.add_system(s)
 
     def init_entities(self):

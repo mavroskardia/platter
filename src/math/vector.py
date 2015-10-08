@@ -31,6 +31,11 @@ class Vec:
             return Vec(self.x / v.x, self.y / v.y)
         return Vec(self.x / v, self.y / v)
 
+    def __rdiv__(self, v):
+        if isinstance(v, Vec):
+            return Vec(self.x / v.x, self.y / v.y)
+        return Vec(self.x / v, self.y / v)
+
     def __idiv__(self, v):
         if isinstance(v, Vec):
             self.x /= v.x
@@ -74,6 +79,16 @@ class Vec:
     def __copy__(self):
         return Vec(self.x, self.y)
 
+    def length(self):
+        return math.sqrt(self.x * self.x + self.y * self.y)
+
+    def lengthsqr(self):
+        return self.x * self.x + self.y * self.y
+
+    def normalize(self):
+        self *= 1.0 / self.length()
+        return self
+
 
 def dot(v1, v2):
     return v1.x * v2.x + v1.y * v2.y
@@ -93,5 +108,14 @@ if __name__ == '__main__':
     assert v0 + v0 == v0
     assert v1 + v1 == Vec(8, 10)
     assert v2 * v2 == Vec(4, 9)
+    assert v1 - v0 == Vec(4, 5)
+    assert v1 - v2 == Vec(2, 2)
+
+    assert v2 / 2 == Vec(1.0, 1.5), v2 / 2.0
+
     v0 += v1
     assert v0 == v1
+
+    v2n = v2.normalize()
+
+    assert v2n == Vec(0.5547001962252291, 0.8320502943378437), v2n

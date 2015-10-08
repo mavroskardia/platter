@@ -29,7 +29,6 @@ BorderRenderer = '.systems.decorations.BorderRendererSystem'
 
 # Components -- Physical
 Acceleration = '.components.physical.Acceleration'
-AffectedByGravity = '.components.physical.AffectedByGravity'
 CanCollide = '.components.physical.CanCollide'
 HasPhysics = '.components.physical.HasPhysics'
 PlayerControl = '.components.player.PlayerControl'

@@ -2,6 +2,7 @@ from sdl2 import *
 
 from . import system
 from .. import config
+from .. import signaler
 from ..math.vector import Vec
 from ..components.player import PlayerControl
 from ..components.physical import Body
@@ -14,14 +15,14 @@ class PlayerInputSystem(system.System):
     acceleration = 30.0
     jump_force = Vec(0, -75.0)
 
-    def init(self, signaler):
-        signaler.register('keydown:Space', self.jump)
+    def init(self):
+        signaler.instance.register('keydown:Space', self.jump)
         self.initiate_jump = False
 
     def jump(self):
         self.initiate_jump = True
 
-    def process(self, *args, signaler, components, elapsed, **kargs):
+    def process(self, *args, components, elapsed, **kargs):
         kp = SDL_GetKeyboardState(None)
 
         for body, pc in components:
@@ -39,4 +40,4 @@ class PlayerInputSystem(system.System):
                     body.acc += self.jump_force
                     body.jumping = True
 
-            signaler.trigger('player_update', body)
+            signaler.instance.trigger('player_update', body)

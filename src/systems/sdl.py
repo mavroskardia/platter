@@ -52,6 +52,7 @@ class SdlSystem(System):
         s = signaler.instance
         s.register('get_renderer', self.get_renderer)
         s.register('draw:rect', self.draw_rect)
+        s.register('draw:line', self.draw_line)
         s.register('draw:filledrect', self.draw_filled_rect)
         s.register('draw:texture', self.draw_texture)
         s.register('draw:text', self.draw_text)
@@ -69,6 +70,11 @@ class SdlSystem(System):
         r = SDL_Rect(int(rect.x), int(rect.y), int(rect.w), int(rect.h))
         SDL_SetRenderDrawColor(self.renderer, 255, 255, 255, 255)
         SDL_RenderDrawRect(self.renderer, r)
+
+    def draw_line(self, x1, y1, x2, y2, *args, **kwargs):
+        x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+        SDL_SetRenderDrawColor(self.renderer, 255, 255, 255, 255)
+        SDL_RenderDrawLine(self.renderer, x1, y1, x2, y2)
 
     def draw_filled_rect(self, rect, *args, **kwargs):
         r = SDL_Rect(int(rect.x), int(rect.y), int(rect.w), int(rect.h))

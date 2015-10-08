@@ -1,8 +1,9 @@
 from sdl2 import *
 
-from . import system
+from .system import System
 
 from .. import config
+from .. import signaler
 from ..main.entity import Entity
 from ..math.vector import Vec
 from ..components.map import Tile
@@ -10,12 +11,11 @@ from ..components.physical import Body
 from ..loaders.map import MapLoader
 
 
-class MapSystem(system.System):
+class MapSystem(System):
 
     componenttypes = Tile,
 
-    def init(self, signaler):
-        self.signaler = signaler
+    def init(self):
         self.set_renderer()
         self.create_map()
 
@@ -23,10 +23,10 @@ class MapSystem(system.System):
         def setr(renderer):
             self.renderer = renderer
 
-        self.signaler.trigger('get_renderer', setr)
+        signaler.instance.trigger('get_renderer', setr)
 
     def create_map(self):
-        self.tileset = MapLoader(self.signaler).load(config.tileset)
+        self.tileset = MapLoader().load(config.tileset)
         basetile = self.tileset['base']
 
         w = config.resolution[0] // config.tile_width
@@ -44,9 +44,9 @@ class MapSystem(system.System):
                 tile_entities.append(entity)
 
         for e in tile_entities:
-            self.signaler.trigger('add_entity', e)
+            signaler.instance.trigger('add_entity', e)
 
-    def process(self, *args, signaler, components, elapsed, **kwargs):
+    def process(self, *args, components, elapsed, **kwargs):
         for tile, in components:
             texture = self.tileset[tile.name].texture
             x, y, w, h = (tile.pos.x, tile.pos.y,

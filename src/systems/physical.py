@@ -4,9 +4,8 @@ from itertools import combinations
 from .system import System
 
 from .. import config
-from ..math.vector import Vec, dot
-from ..components.physical import (AffectedByGravity, Body, CanCollide,
-                                   HasPhysics)
+from ..math.vector import Vec, dot, norm
+from ..components.physical import (Body, CanCollide, HasPhysics)
 
 
 class GravitySystem(System):
@@ -14,7 +13,7 @@ class GravitySystem(System):
         Applies gravity to bodies susceptible to gravity
     '''
 
-    componenttypes = AffectedByGravity, Body
+    componenttypes = Body, HasPhysics
 
     g = Vec(0, config.gravity)
 
@@ -42,84 +41,149 @@ class ForceSystem(System):
             body.vel *= self.air_friction
 
 
+class Manifold:
+
+    g = Vec(0, 10.0)
+    epsilon = 0.0001
+
+    def __init__(self, a, b, dt):
+        self.a = a
+        self.b = b
+        self.dt = dt
+
+        self.e = min(a.restitution, b.restitution)
+
+        self.sf = 0.0
+        self.df = 0.0
+
+        self.n = Vec(0, 0)
+        self.penetration = 0.0
+
+    def init(self):
+        self.sf = math.sqrt(self.a.static_friction * self.b.static_friction)
+        self.df = math.sqrt(self.a.dynamic_friction * self.b.dynamic_friction)
+
+        rv = b.vel - a.vel
+        if rv.lengthsqr() < self.g.lengthsqr() + self.epsilon:
+            self.e = 0.0
+
+    def solve(self):
+        a, b = self.a, self.b
+        n = b.pos - a.pos
+
+        ax_extent = (a.max.x - a.min.x) / 2.0
+        bx_extent = (b.max.x - b.min.x) / 2.0
+        xoverlap = ax_extent + bx_extent - abs(n.x)
+        if xoverlap > 0.0:
+
+            ay_extent = (a.max.y - a.min.y) / 2.0
+            by_extent = (b.max.y - b.min.y) / 2.0
+            yoverlap = ay_extent + by_extent - abs(n.y)
+            if yoverlap > 0.0:
+
+                if xoverlap > yoverlap:
+                    self.n = Vec(-1.0, 0.0) if n.x < 0.0 else Vec(1.0, 0.0)
+                    self.penetration = xoverlap
+                    return True
+                else:
+                    self.n = Vec(0.0, -1.0) if n.y < 0.0 else Vec(0.0, 1.0)
+                    self.penetration = yoverlap
+                    return True
+
+        return False
+
+    def resolve(self):
+        a, b, r = self.a, self.b, self.b - self.a
+        vn = dot(r, self.n)
+
+        if vn > 0:
+            return  # moving away from each other
+
+        j = -(1.0 + self.e) * vn
+        j /= (a.im + b.im)
+
+        a.apply_impulse(-j * self.n)
+        b.apply_impulse(j * self.n)
+
+        t = r - self.n * vn
+        if t.length() > self.epsilon:
+            t.normalize()
+
+        jt = -dot(r, t)
+        jt /= (a.im + b.im)
+
+        ajt = abs(jt)
+
+        if ajt < self.epsilon:
+            return  # don't bother applying friction to such a tiny impulse
+
+        t *= jt if ajt < j * self.sf else -j * self.df
+
+        a.apply_impulse(-t)
+        b.apply_impulse(t)
+
+    def correct(self):
+        a, b = self.a, self.b
+
+        pct, slop = 0.7, 0.05
+        m = max(self.penetration - slop, 0.0) / (a.im + b.im)
+
+        c = m * self.n * pct * self.dt
+
+        a.pos -= c * a.im
+        b.pos += c * b.im
+
+
 class PhysicsSystem(System):
 
     componenttypes = Body, CanCollide, HasPhysics
 
-    class Manifold:
+    gravity = Vec(0, config.gravity)
 
-        def __init__(self, a, b):
-            self.a = a
-            self.b = b
-            self.n = None
-            self.penetration = 0.0
-
-    def aabb_vs_aabb(self, a, b):
-        manifold = self.Manifold(a, b)
-        n = b.pos - a.pos
-
-        ax_extent = a.w / 2.0
-        bx_extent = b.w / 2.0
-        xoverlap = ax_extent + bx_extent - abs(n.x)
-        if xoverlap > 0.0:
-            ay_extent = a.h / 2.0
-            by_extent = b.h / 2.0
-            yoverlap = ay_extent + by_extent - abs(n.y)
-
-            if yoverlap > 0.0:
-
-                if xoverlap > yoverlap:
-                    manifold.n = Vec(-1.0, 0.0) if n.x < 0.0 else Vec(1.0, 0.0)
-                    manifold.penetration = xoverlap
-                    return True, manifold
-                else:
-                    manifold.n = Vec(0.0, -1.0) if n.y < 0.0 else Vec(0.0, 1.0)
-                    manifold.penetration = yoverlap
-                    return True, manifold
-
-        return False, manifold
-
-    def process(self, *args, components, elapsed, **kwargs):
-
-        for (body, r, rr), (otherbody, s, ss) in combinations(components, 2):
-            if body.inv_mass == 0 and otherbody.inv_mass == 0:
-                continue
-
-            a = copy(body)
-            a.x = body.pos.x + body.vel.x * elapsed
-            a.y = body.pos.y + body.vel.y * elapsed
-
-            b = copy(otherbody)
-            b.x = otherbody.pos.x + otherbody.vel.x * elapsed
-            b.y = otherbody.pos.y + otherbody.vel.y * elapsed
-
-            colliding, manifold = self.aabb_vs_aabb(a, b)
-
-            if colliding:
-                rel_vel = b.vel - a.vel
-                vel_norm = dot(rel_vel, manifold.n)
-
-                if vel_norm > 0.0:  # moving away from each other
+    def find_collisions(self, components, dt):
+        self.contacts = []
+        for a, *_ in components:
+            for b, *_ in components:
+                if a is b or a.im == 0 and b.im == 0:
                     continue
 
-                e = min(a.restitution, b.restitution)
-                j = -(1 + e) * vel_norm
-                j /= a.inv_mass + b.inv_mass
-                impulse = j * manifold.n
+                if a.is_overlapping(b):
+                    print('ol')
+                    m = Manifold(a, b, dt)
+                    if m.solve():
+                        self.contacts.append(m)
 
-                body.vel = a.vel - a.inv_mass * impulse
-                otherbody.vel = b.vel + b.inv_mass * impulse
+    def integrate_forces(self, components):
+        for body, *_ in components:
+            body.integrate_forces(self.gravity)
 
-                body.colliding = True
-                otherbody.colliding = True
-            else:
-                body.colliding, otherbody.colliding = False, False
-                body, otherbody = a, b
+    def initialize_collisions(self):
+        for c in self.contacts:
+            c.init()
 
-        for body, _, __ in components:
+    def integrate_velocities(self, components, dt):
+        for body, *_ in components:
+            if body.im != 0:
+                body.pos += body.vel * dt
+                body.vel += self.gravity
 
-            if not body.colliding:
-                body.pos += body.vel * elapsed
+    def resolve_collisions(self):
+        iterations = 1
+        for i in range(iterations):
+            for c in self.contacts:
+                c.resolve()
+
+    def correct_positions(self):
+        for c in self.contacts:
+            c.correct()
+
+    def process(self, *args, components, elapsed, **kwargs):
+        self.find_collisions(components, elapsed)
+        self.integrate_forces(components)
+        self.initialize_collisions()
+        self.resolve_collisions()
+        self.integrate_velocities(components, elapsed)
+        self.correct_positions()
 
 
 class CollisionDetectionSystem0(System):

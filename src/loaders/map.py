@@ -1,6 +1,8 @@
 from configparser import ConfigParser
 from sdl2.sdlimage import IMG_Load
 
+from .. import signaler
+
 
 class TileData:
 
@@ -13,9 +15,6 @@ class TileData:
 class MapLoader:
 
     trigger = '_internal:convert_surface_to_texture'
-
-    def __init__(self, signaler):
-        self.signaler = signaler
 
     def load(self, filename):
         tiles = {}
@@ -31,6 +30,6 @@ class MapLoader:
                 tiles[tilename] = TileData(tilename, tex, can_walk)
 
             imgfile = data['file'].encode()
-            self.signaler.trigger(self.trigger, IMG_Load(imgfile), add)
+            signaler.instance.trigger(self.trigger, IMG_Load(imgfile), add)
 
         return tiles
