@@ -23,7 +23,7 @@ class Body(Component):
     def __init__(self, entity, *args, **kwargs):
         super().__init__(entity, *args, **kwargs)
 
-        # center position
+        # top-left position
         self.pos = Vec(kwargs.pop('x', 0.0), kwargs.pop('y', 0.0))
         # dimensions
         self.w, self.h = kwargs.pop('w', 10), kwargs.pop('h', 10)
@@ -64,17 +64,14 @@ class Body(Component):
         self.force = Vec(0, 0)
 
     def update_bounds(self):
-        self.min = self.pos - Vec(self.w / 2, self.h / 2)
-        self.max = self.pos + Vec(self.w / 2, self.h / 2)
+        self.min = self.pos
+        self.max = self.pos + Vec(self.w, self.h)
 
     def is_overlapping(self, other):
-        if self.max.x < other.min.x or self.min.x > other.max.x:
-            return False
-
-        if self.max.y < other.min.y or self.min.y > other.max.y:
-            return False
-
-        return True
+        return (self.pos.x < other.pos.x + other.w and
+                self.pos.x + self.w > other.pos.x and
+                self.pos.y < other.pos.y + other.h and
+                self.pos.y + self.h > other.pos.y)
 
     def __str__(self):
         return '''Body for {s.entity.name}:
@@ -103,5 +100,4 @@ class Body(Component):
             return 'left'
 
     def as_rect(self):
-        return Body.Rect(self.pos.x-self.w / 2, self.pos.y-self.h / 2,
-                         self.w, self.h)
+        return Body.Rect(self.pos.x, self.pos.y, self.w, self.h)

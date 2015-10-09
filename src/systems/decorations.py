@@ -1,5 +1,6 @@
 from .system import System
 from .. import signaler
+from ..math.vector import Vec
 from ..components.decoration import Bordered
 from ..components.physical import Body
 
@@ -17,9 +18,27 @@ class VectorRendererSystem(System):
 
     componenttypes = Body,
 
+    sf = 0.1
+    head_sf = 10.0
+
     def process(self, *args, components, elapsed, **kwargs):
 
         for body, in components:
-            n = body.pos + body.vel
+            dimvec = Vec(body.w/2, body.h/2)
+            c = body.pos + dimvec
+            c_plus_vel = c + (body.vel * self.sf)
+
+            p1 = c_plus_vel + (c_plus_vel - c).perpendicular().normalize() * self.head_sf
+            p2 = c_plus_vel - (c_plus_vel - c).perpendicular().normalize() * self.head_sf
+
             signaler.instance.trigger('draw:line',
-                                      n.x, n.y, body.pos.x, body.pos.y)
+                                      c.x, c.y,
+                                      c_plus_vel.x, c_plus_vel.y)
+
+            signaler.instance.trigger('draw:line',
+                                      c_plus_vel.x, c_plus_vel.y,
+                                      p1.x, p1.y)
+
+            signaler.instance.trigger('draw:line',
+                                      c_plus_vel.x, c_plus_vel.y,
+                                      p2.x, p2.y)

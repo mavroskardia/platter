@@ -86,8 +86,11 @@ class Vec:
         return self.x * self.x + self.y * self.y
 
     def normalize(self):
-        self *= 1.0 / self.length()
+        self *= 1.0 / (self.length() + 0.00001)
         return self
+
+    def perpendicular(self):
+        return Vec(-self.y, self.x)
 
 
 def dot(v1, v2):

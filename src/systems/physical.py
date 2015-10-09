@@ -1,3 +1,5 @@
+import math
+
 from copy import copy
 from itertools import combinations
 
@@ -63,21 +65,21 @@ class Manifold:
         self.sf = math.sqrt(self.a.static_friction * self.b.static_friction)
         self.df = math.sqrt(self.a.dynamic_friction * self.b.dynamic_friction)
 
-        rv = b.vel - a.vel
-        if rv.lengthsqr() < self.g.lengthsqr() + self.epsilon:
+        rv = self.b.vel - self.a.vel
+        if rv.lengthsqr() < (self.g.lengthsqr() + self.epsilon):
             self.e = 0.0
 
     def solve(self):
         a, b = self.a, self.b
         n = b.pos - a.pos
 
-        ax_extent = (a.max.x - a.min.x) / 2.0
-        bx_extent = (b.max.x - b.min.x) / 2.0
+        ax_extent = a.pos.x + a.w / 2.0
+        bx_extent = b.pos.x + b.w / 2.0
         xoverlap = ax_extent + bx_extent - abs(n.x)
         if xoverlap > 0.0:
 
-            ay_extent = (a.max.y - a.min.y) / 2.0
-            by_extent = (b.max.y - b.min.y) / 2.0
+            ay_extent = a.pos.y + a.h / 2.0
+            by_extent = b.pos.y + b.h / 2.0
             yoverlap = ay_extent + by_extent - abs(n.y)
             if yoverlap > 0.0:
 
@@ -86,6 +88,7 @@ class Manifold:
                     self.penetration = xoverlap
                     return True
                 else:
+                    print('yo')
                     self.n = Vec(0.0, -1.0) if n.y < 0.0 else Vec(0.0, 1.0)
                     self.penetration = yoverlap
                     return True
@@ -93,7 +96,7 @@ class Manifold:
         return False
 
     def resolve(self):
-        a, b, r = self.a, self.b, self.b - self.a
+        a, b, r = self.a, self.b, self.b.pos - self.a.pos
         vn = dot(r, self.n)
 
         if vn > 0:
@@ -130,8 +133,8 @@ class Manifold:
 
         c = m * self.n * pct * self.dt
 
-        a.pos -= c * a.im
-        b.pos += c * b.im
+        a.pos = a.pos - (c * a.im)
+        b.pos = b.pos + (c * b.im)
 
 
 class PhysicsSystem(System):
@@ -148,7 +151,6 @@ class PhysicsSystem(System):
                     continue
 
                 if a.is_overlapping(b):
-                    print('ol')
                     m = Manifold(a, b, dt)
                     if m.solve():
                         self.contacts.append(m)

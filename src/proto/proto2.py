@@ -63,16 +63,14 @@ def add_entity(ecs):
 
 def add_platforms(ecs):
     entity = Entity(random.random())
-    entity.components.append(Body(entity, x=300, y=300, w=100, h=50, mass=0))
+    entity.components.append(Body(entity, x=250, y=300, w=150, h=50, mass=0))
     entity.components.append(Bordered(entity))
     entity.components.append(CanCollide(entity))
     entity.components.append(HasPhysics(entity, True))
     ecs.add_entity(entity)
 
     entity = Entity(random.random())
-    entity.components.append(Body(entity,
-                                  x=config.resolution[0] / 2,
-                                  y=config.resolution[1] - 50,
+    entity.components.append(Body(entity, x=0, y=config.resolution[1] - 50,
                                   w=config.resolution[0], h=50, mass=0))
     entity.components.append(Bordered(entity))
     entity.components.append(CanCollide(entity))
