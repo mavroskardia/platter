@@ -70,20 +70,14 @@ class Manifold:
             self.e = 0.0
 
     def solve(self):
-        a, b = self.a, self.b
-        n = b.pos - a.pos
-
-        ax_extent = a.pos.x + a.w / 2.0
-        bx_extent = b.pos.x + b.w / 2.0
-        xoverlap = ax_extent + bx_extent - abs(n.x)
+        a, b, n = self.a, self.b, self.b.pos - self.a.pos
+        aextent, bextent = a.pos + Vec(a.w, a.h), b.pos + Vec(b.w, b.h)
+        xoverlap = aextent.x + bextent.x - abs(n.x)
         if xoverlap > 0.0:
-
-            ay_extent = a.pos.y + a.h / 2.0
-            by_extent = b.pos.y + b.h / 2.0
-            yoverlap = ay_extent + by_extent - abs(n.y)
+            yoverlap = aextent.y + bextent.y - abs(n.y)
             if yoverlap > 0.0:
-
                 if xoverlap > yoverlap:
+                    print('xo')
                     self.n = Vec(-1.0, 0.0) if n.x < 0.0 else Vec(1.0, 0.0)
                     self.penetration = xoverlap
                     return True
@@ -170,7 +164,7 @@ class PhysicsSystem(System):
                 body.vel += self.gravity
 
     def resolve_collisions(self):
-        iterations = 1
+        iterations = 10
         for i in range(iterations):
             for c in self.contacts:
                 c.resolve()

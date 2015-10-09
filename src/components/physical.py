@@ -49,9 +49,9 @@ class Body(Component):
         if self.im != 0:
             self.vel += 0.5 * (self.force * self.im + f)
 
-    def integrate_velocities(self, v):
+    def integrate_velocities(self, v, dt):
         if self.im != 0:
-            self.pos += self.vel
+            self.pos += self.vel * dt
             self.integrate_forces(v)
 
     def apply_impulse(self, i):
