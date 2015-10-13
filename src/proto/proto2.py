@@ -85,30 +85,12 @@ def proto():
 
     fps.init()
 
-    sdl = SdlSystem()
-    sdl.init()
-
-    ps = PhysicsSystem()
-    ps.init()
-
-    inps = InputSystem()
-    inps.init()
-
-    brs = BorderRendererSystem()
-    brs.init()
-
-    vrs = VectorRendererSystem()
-    vrs.init()
-
-    pinps = PlayerInputSystem()
-    pinps.init()
-
-    ecs.add_system(sdl)
-    ecs.add_system(inps)
-    ecs.add_system(ps)
-    ecs.add_system(brs)
-    ecs.add_system(vrs)
-    ecs.add_system(pinps)
+    ecs.add_system(SdlSystem(), init=True)
+    ecs.add_system(InputSystem(), init=True)
+    ecs.add_system(PhysicsSystem(), init=True)
+    ecs.add_system(BorderRendererSystem(), init=True)
+    ecs.add_system(VectorRendererSystem(), init=True)
+    ecs.add_system(PlayerInputSystem(), init=True)
 
     add_platforms(ecs)
 

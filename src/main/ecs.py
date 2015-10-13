@@ -50,9 +50,13 @@ class EntityComponentSystemManager:
 
             self.add_entity(entity)
 
-    def add_system(self, system):
+    def add_system(self, system, init=False):
+        if init:
+            system.init()
+
         if system.componenttypes not in self.systemdb:
             self.systemdb[system.componenttypes] = []
+
         self.systemdb[system.componenttypes].append(system)
 
     def add_entity(self, entity):
