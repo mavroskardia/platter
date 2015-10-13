@@ -26,8 +26,10 @@ SpriteSystem = '.systems.sprite.SpriteSystem'
 # Systems -- Debugging
 
 BorderRenderer = '.systems.decorations.BorderRendererSystem'
+VectorRenderer = '.systems.decorations.VectorRendererSystem'
 
 # Components -- Physical
+
 Acceleration = '.components.physical.Acceleration'
 CanCollide = '.components.physical.CanCollide'
 HasPhysics = '.components.physical.HasPhysics'

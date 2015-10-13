@@ -4,35 +4,35 @@ from .base import *
 
 entities = OrderedDict()
 
-# entities['player'] = {
-#     Body: (None, {'x': 100, 'y': 300, 'w': 37, 'h': 64, 'vx': 0, 'vy': 0,
-#                   'nx': 0, 'ny': 0, 'fx': 1.0, 'fy': 1.0, 'mass': 10.0}),
-#     CanCollide: None,
-#     HasPhysics: None,
-#     PlayerControl: None,
-#     Sprite: (('default',), {}),
-# }
+entities['player'] = {
+    Body: (None, {'x': 100, 'y': 300, 'w': 37, 'h': 64, 'r': 1.0,
+                  'mass': 100.0}),
+    CanCollide: None,
+    HasPhysics: None,
+    PlayerControl: None,
+    Sprite: (('default',), {}),
+}
 
 entities['ground'] = {
     Bordered: None,
     CanCollide: None,
     HasPhysics: ((True,), {}),
     Body: (None, {'x': -5, 'y': resolution[1] - 50, 'w': resolution[0]+15,
-                  'h': 55, 'mass': 0, 'r': 0.9}),
+                  'h': 55, 'mass': 0, 'r': 1.0}),
 }
 
 entities['platform'] = {
     Bordered: None,
     CanCollide: None,
     HasPhysics: ((True,), {}),
-    Body: (None, {'x': 100, 'y': 500, 'w': 200, 'h': 50, 'mass': 0, 'r': 0.9}),
+    Body: (None, {'x': 100, 'y': 500, 'w': 200, 'h': 50, 'mass': 0, 'r': 1.0}),
 }
 
 entities['obstacle'] = {
     Bordered: None,
     CanCollide: None,
     HasPhysics: ((True,), {}),
-    Body: (None, {'x': 400, 'y': 680, 'w': 200, 'h': 50, 'mass': 0, 'r': 0.9}),
+    Body: (None, {'x': 400, 'y': 680, 'w': 200, 'h': 50, 'mass': 0, 'r': 1.0}),
 }
 
 entities['collider1'] = {

@@ -18,11 +18,10 @@ class VectorRendererSystem(System):
 
     componenttypes = Body,
 
-    sf = 0.1
+    sf = 1.0
     head_sf = 10.0
 
     def process(self, *args, components, elapsed, **kwargs):
-
         for body, in components:
             dimvec = Vec(body.w/2, body.h/2)
             c = body.pos + dimvec

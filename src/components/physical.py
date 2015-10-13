@@ -31,8 +31,8 @@ class Body(Component):
         self.vel = Vec(kwargs.pop('vx', 0.0), kwargs.pop('vy', 0.0))
 
         # frictions
-        self.static_friction = kwargs.pop('sf', 1.0)
-        self.dynamic_friction = kwargs.pop('df', 0.3)
+        self.static_friction = kwargs.pop('sf', 0.2)
+        self.dynamic_friction = kwargs.pop('df', 20.1)
 
         # restitution
         self.restitution = kwargs.pop('r', 0.1)
@@ -44,6 +44,9 @@ class Body(Component):
         # calculation vars
         self.force = Vec(0, 0)
         self.update_bounds()
+
+        # game state variables
+        self.jumping = False
 
     def integrate_forces(self, f):
         if self.im != 0:
@@ -83,21 +86,22 @@ class Body(Component):
 
     @property
     def moving(self):
-        return self.vel.x > 0 or self.vel.y > 0
+        return self.vel.x > 0.1
 
     def higher_than(self, other):
         return self.pos.y + self.h >= other.pos.y
 
     @property
     def direction(self):
+        if self.vel.x > 0:
+            return 'right'
+        else:
+            return 'left'
+
         if self.vel.y < 0:
             return 'up'
         elif self.vel.y > 0:
             return 'down'
-        elif self.vel.x > 0:
-            return 'right'
-        else:
-            return 'left'
 
     def as_rect(self):
         return Body.Rect(self.pos.x, self.pos.y, self.w, self.h)

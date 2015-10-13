@@ -47,6 +47,7 @@ class Manifold:
 
     g = Vec(0, 10.0)
     epsilon = 0.0001
+    smoothing = 0.7
 
     def __init__(self, a, b, dt):
         self.a = a
@@ -71,18 +72,16 @@ class Manifold:
 
     def solve(self):
         a, b, n = self.a, self.b, self.b.pos - self.a.pos
-        aextent, bextent = a.pos + Vec(a.w, a.h), b.pos + Vec(b.w, b.h)
+        aextent, bextent = a.pos + Vec(a.w/2, a.h), b.pos + Vec(b.w/2, b.h)
         xoverlap = aextent.x + bextent.x - abs(n.x)
-        if xoverlap > 0.0:
+        if xoverlap >= 0.0:
             yoverlap = aextent.y + bextent.y - abs(n.y)
-            if yoverlap > 0.0:
+            if yoverlap >= 0.0:
                 if xoverlap > yoverlap:
-                    print('xo')
                     self.n = Vec(-1.0, 0.0) if n.x < 0.0 else Vec(1.0, 0.0)
                     self.penetration = xoverlap
                     return True
                 else:
-                    print('yo')
                     self.n = Vec(0.0, -1.0) if n.y < 0.0 else Vec(0.0, 1.0)
                     self.penetration = yoverlap
                     return True
@@ -122,13 +121,28 @@ class Manifold:
     def correct(self):
         a, b = self.a, self.b
 
-        pct, slop = 0.7, 0.05
+        pct, slop = 0.15, 0.5001
         m = max(self.penetration - slop, 0.0) / (a.im + b.im)
 
         c = m * self.n * pct * self.dt
 
+        oa = copy(a.pos)
+        ob = copy(b.pos)
+
         a.pos = a.pos - (c * a.im)
         b.pos = b.pos + (c * b.im)
+
+        # smoothing function
+        a.pos = (a.pos * self.smoothing) + (oa * (1.0 - self.smoothing))
+        b.pos = (b.pos * self.smoothing) + (ob * (1.0 - self.smoothing))
+
+        if a.im != 0:
+            if self.n.y == 1.0:
+                a.vel -= self.g
+
+        if b.im != 0:
+            if self.n.y == 1.0:
+                b.vel -= self.g
 
 
 class PhysicsSystem(System):
@@ -148,6 +162,8 @@ class PhysicsSystem(System):
                     m = Manifold(a, b, dt)
                     if m.solve():
                         self.contacts.append(m)
+                        # TODO: move this to somewhere less offensive
+                        a.jumping, b.jumping = False, False
 
     def integrate_forces(self, components):
         for body, *_ in components:
@@ -162,9 +178,11 @@ class PhysicsSystem(System):
             if body.im != 0:
                 body.pos += body.vel * dt
                 body.vel += self.gravity
+                body.vel *= Vec(0.95, 1)  # global friction application
+                body.vel.x = max(-100, min(100, body.vel.x))
+                body.vel.y = max(-200, min(200, body.vel.y))
 
     def resolve_collisions(self):
-        iterations = 10
         for i in range(iterations):
             for c in self.contacts:
                 c.resolve()
@@ -176,8 +194,11 @@ class PhysicsSystem(System):
     def process(self, *args, components, elapsed, **kwargs):
         self.find_collisions(components, elapsed)
         self.integrate_forces(components)
-        self.initialize_collisions()
-        self.resolve_collisions()
+
+        for c in self.contacts:
+            # c.init()
+            c.resolve()
+
         self.integrate_velocities(components, elapsed)
         self.correct_positions()
 
