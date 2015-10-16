@@ -66,8 +66,7 @@ class App:
 
         self.ecs.init_systems()
 
-        hit_play_on_title = TitleApp().run()
-        if not hit_play_on_title:
+        if not TitleApp().run():
             return
 
         self.ecs.init_entities()
@@ -80,12 +79,13 @@ class App:
             self.fps.tick_end()
 
     def register_global_events(self):
-        signaler.instance.register('add_entity', self.ecs.add_entity)
-        signaler.instance.register('quit', self.quit)
-        signaler.instance.register('keydown:Escape', self.quit)
-        signaler.instance.register('keydown:D', self.debug)
-        signaler.instance.register('remove_component', self.ecs.remove_component)
-        signaler.instance.register('add_component', self.ecs.add_component)
+        s = signaler.instance
+        s.register('add_entity', self.ecs.add_entity)
+        s.register('quit', self.quit)
+        s.register('keydown:Escape', self.quit)
+        s.register('keydown:D', self.debug)
+        s.register('remove_component', self.ecs.remove_component)
+        s.register('add_component', self.ecs.add_component)
 
     def quit(self):
         self.running = False

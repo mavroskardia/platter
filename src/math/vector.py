@@ -26,17 +26,17 @@ class Vec:
         self.y -= v.y
         return self
 
-    def __div__(self, v):
+    def __truediv__(self, v):
         if isinstance(v, Vec):
             return Vec(self.x / v.x, self.y / v.y)
         return Vec(self.x / v, self.y / v)
 
-    def __rdiv__(self, v):
+    def __rtruediv__(self, v):
         if isinstance(v, Vec):
             return Vec(self.x / v.x, self.y / v.y)
         return Vec(self.x / v, self.y / v)
 
-    def __idiv__(self, v):
+    def __itruediv__(self, v):
         if isinstance(v, Vec):
             self.x /= v.x
             self.y /= v.y
@@ -117,8 +117,11 @@ if __name__ == '__main__':
     assert v2 / 2 == Vec(1.0, 1.5), v2 / 2.0
 
     v0 += v1
-    assert v0 == v1
+    assert v0.x == v1.x
+    assert v0.y == v1.y
+    v0 += v1
+    assert v0 == Vec(8, 10)
 
     v2n = v2.normalize()
 
-    assert v2n == Vec(0.5547001962252291, 0.8320502943378437), v2n
+    assert v2n == Vec(0.5546986577679576, 0.8320479866519364), v2n

@@ -1,14 +1,29 @@
 from sdl2 import *
 
-from . import system
+from .system import System
 from .. import config
 from .. import signaler
 from ..math.vector import Vec
-from ..components.player import PlayerControl
+from ..components.player import PlayerControl, PlayerData
 from ..components.physical import Body
 
 
-class PlayerInputSystem(system.System):
+class PlayerDataSystem(System):
+
+    componenttypes = PlayerData,
+
+    def process(self, *args, components, elapsed, **kwargs):
+
+        for pd, in components:
+            signaler.instance.trigger(
+                'draw:text', str(pd.score), SDL_Rect(0, 0, 0, 0))
+
+            signaler.instance.trigger(
+                'draw:text', str(pd.lives),
+                SDL_Rect(config.resolution[0]-100, 0, 0, 0))
+
+
+class PlayerInputSystem(System):
 
     componenttypes = Body, PlayerControl
 
@@ -37,4 +52,4 @@ class PlayerInputSystem(system.System):
                     body.jumping = True
                     body.vel += self.jump_force
 
-            signaler.instance.trigger('player_update', body)
+            signaler.instance.trigger('player:update', body)

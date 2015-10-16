@@ -10,6 +10,7 @@ entities['player'] = {
     CanCollide: None,
     HasPhysics: None,
     PlayerControl: None,
+    PlayerData: None,
     Sprite: (('default',), {}),
 }
 
@@ -17,7 +18,7 @@ entities['ground'] = {
     Bordered: None,
     CanCollide: None,
     HasPhysics: ((True,), {}),
-    Body: (None, {'x': -5, 'y': resolution[1] - 50, 'w': resolution[0]+15,
+    Body: (None, {'x': -5, 'y': resolution[1] - 50, 'w': 10000,
                   'h': 55, 'mass': 0, 'r': 1.0}),
 }
 

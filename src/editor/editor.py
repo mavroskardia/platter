@@ -1,5 +1,6 @@
 import sys
 import os
+import argparse
 
 try:
     os.environ['PYSDL2_DLL_PATH'] = 'lib'
@@ -13,13 +14,15 @@ except ImportError:
 from ..main.ecs import EntityComponentSystemManager
 from ..systems.sdl import SdlSystem
 from ..systems.input import InputSystem
+from ..systems.map import MapSystem
 from ..main.fps import Fps
 from .. import signaler
 
-running = True
-
 
 class Editor:
+
+    def __init__(self, basetile='base'):
+        self.basetile = basetile
 
     def run(self):
 
@@ -30,20 +33,31 @@ class Editor:
 
         ecs.add_system(SdlSystem(), init=True)
         ecs.add_system(InputSystem(), init=True)
+        ecs.add_system(MapSystem(), init=True)
 
-        def quit():
-            running = False
+        signaler.instance.register('quit', self.quit)
 
-        signaler.instance.register('quit', quit)
+        self.running = True
 
-        while running:
+        while self.running:
             ecs.process(fps.tick_start())
             fps.tick_end()
+
+        return 0
+
+    def quit(self):
+        self.running = False
 
 
 if __name__ == '__main__':
 
-    editor = Editor()
+    parser = argparse.ArgumentParser(description='Level editor for Platterman')
+    parser.add_argument('-f', '--mapfile', type=str,
+                        help='existing map file to edit')
+    parser.add_argument('-b', '--basetile', type=str, help='map base tile')
+    args = parser.parse_args()
+
+    editor = Editor(args.basetile)
     ret = editor.run()
 
     sys.exit(ret)

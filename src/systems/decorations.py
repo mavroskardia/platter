@@ -18,26 +18,29 @@ class VectorRendererSystem(System):
 
     componenttypes = Body,
 
-    sf = 1.0
-    head_sf = 10.0
+    sf = 0.5
+    head_sf = 2.0
 
     def process(self, *args, components, elapsed, **kwargs):
         for body, in components:
             dimvec = Vec(body.w/2, body.h/2)
             c = body.pos + dimvec
-            c_plus_vel = c + (body.vel * self.sf)
+            cv = c + (body.vel * self.sf)
 
-            p1 = c_plus_vel + (c_plus_vel - c).perpendicular().normalize() * self.head_sf
-            p2 = c_plus_vel - (c_plus_vel - c).perpendicular().normalize() * self.head_sf
+            p1 = cv + (cv - c).perpendicular().normalize() * self.head_sf
+            p2 = cv - (cv - c).perpendicular().normalize() * self.head_sf
 
             signaler.instance.trigger('draw:line',
                                       c.x, c.y,
-                                      c_plus_vel.x, c_plus_vel.y)
+                                      cv.x, cv.y,
+                                      color=(255, 255, 255, 50))
 
             signaler.instance.trigger('draw:line',
-                                      c_plus_vel.x, c_plus_vel.y,
-                                      p1.x, p1.y)
+                                      cv.x, cv.y,
+                                      p1.x, p1.y,
+                                      color=(255, 255, 255, 50))
 
             signaler.instance.trigger('draw:line',
-                                      c_plus_vel.x, c_plus_vel.y,
-                                      p2.x, p2.y)
+                                      cv.x, cv.y,
+                                      p2.x, p2.y,
+                                      color=(255, 255, 255, 50))

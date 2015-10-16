@@ -13,6 +13,57 @@ from ..loaders.map import MapLoader
 
 class MapSystem(System):
 
+    def process(self, *args, components, elapsed, **kwargs):
+        self.tileset = MapLoader().load(config.tileset)
+        basetile = self.tileset['base']
+
+        # keep tile flyweight
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class OldMapSystem(System):
+
     componenttypes = Tile,
 
     def init(self):

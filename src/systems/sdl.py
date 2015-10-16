@@ -6,6 +6,7 @@ from sdl2.sdlttf import *
 from .system import System
 from .. import config
 from .. import signaler
+from ..math.vector import Vec
 
 
 class SdlSystem(System):
@@ -36,17 +37,21 @@ class SdlSystem(System):
         if not self.font:
             raise Exception(TTF_GetError())
 
-        self.register_events()
-        self.clear()
+        SDL_SetRenderDrawBlendMode(self.renderer, SDL_BLENDMODE_BLEND)
 
-    def clear(self):
-        SDL_SetRenderDrawColor(self.renderer, 0, 0, 0, 255)
-        SDL_RenderClear(self.renderer)
+        self.middle = Vec(config.resolution[0] / 2, config.resolution[1] / 2)
+        self.offset = Vec(0, 0)
+
+        self.register_events()
 
     def process(self, *args, entities=None, elapsed=0, **kargs):
         SDL_RenderPresent(self.renderer)
-        self.clear()
+        SDL_SetRenderDrawColor(self.renderer, 0, 0, 0, 255)
+        SDL_RenderClear(self.renderer)
         SDL_Delay(5)
+
+    def translate(self, x, y):
+        return int(x + self.offset.x), int(y + self.offset.y)
 
     def register_events(self):
         s = signaler.instance
@@ -58,26 +63,49 @@ class SdlSystem(System):
         s.register('draw:text', self.draw_text)
         s.register('_internal:convert_surface_to_texture',
                    self.convert_surface_to_texture)
+        s.register('player:update', self.update_offset)
+
+    def update_offset(self, body):
+        return
+        if body.pos.x > self.offset.x + self.middle.x:
+            # player is right-of-center, correct offset so it's centered
+            self.offset.x -= 1
+        elif body.pos.x < self.offset.x + self.offset.x:
+            # player is left-of-center, correct offset so it's centered
+            self.offset.x += 1
+
+        # make sure never fly off the left-side of the map
+        self.offset.x = max(0, self.offset.x)
+        # temporarily prevent flying off the right-side of the map
+        self.offset.x = min(10000, self.offset.x)
+
+        # constant value gives feeling of a auto-scrolling world
+        # self.offset.x -= 1
 
     def get_renderer(self, callback):
         callback(self.renderer)
 
     def draw_texture(self, texture, rect, *args, **kwargs):
-        r = SDL_Rect(int(rect.x), int(rect.y), int(rect.w), int(rect.h))
+        x, y = self.translate(rect.x, rect.y)
+        r = SDL_Rect(x, y, int(rect.w), int(rect.h))
         SDL_RenderCopy(self.renderer, texture, None, r)
 
     def draw_rect(self, rect, *args, **kwargs):
-        r = SDL_Rect(int(rect.x), int(rect.y), int(rect.w), int(rect.h))
-        SDL_SetRenderDrawColor(self.renderer, 255, 255, 255, 255)
+        x, y = self.translate(rect.x, rect.y)
+        r = SDL_Rect(x, y, int(rect.w), int(rect.h))
+        c = kwargs.pop('color', (255, 255, 255, 50))
+        SDL_SetRenderDrawColor(self.renderer, *c)
         SDL_RenderDrawRect(self.renderer, r)
 
     def draw_line(self, x1, y1, x2, y2, *args, **kwargs):
-        x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
-        SDL_SetRenderDrawColor(self.renderer, 255, 255, 255, 255)
+        (x1, y1), (x2, y2) = self.translate(x1, y1), self.translate(x2, y2)
+        c = kwargs.pop('color', (255, 255, 255, 50))
+        SDL_SetRenderDrawColor(self.renderer, *c)
         SDL_RenderDrawLine(self.renderer, x1, y1, x2, y2)
 
     def draw_filled_rect(self, rect, *args, **kwargs):
-        r = SDL_Rect(int(rect.x), int(rect.y), int(rect.w), int(rect.h))
+        x, y = self.translate(rect.x, rect.y)
+        r = SDL_Rect(x, y, int(rect.w), int(rect.h))
         SDL_SetRenderDrawColor(self.renderer, 255, 255, 255, 255)
         SDL_RenderFillRect(self.renderer, r)
 

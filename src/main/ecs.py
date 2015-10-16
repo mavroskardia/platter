@@ -16,6 +16,7 @@ class EntityComponentSystemManager:
         self.systemdb = OrderedDict()
         self.componentdb = defaultdict(list)
         self.deferred_component_removals = []
+        signaler.instance.register('add_entity', self.add_entity)
 
     def init_systems(self):
         for system in config.systems:

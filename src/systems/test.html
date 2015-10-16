@@ -1,0 +1,17 @@
+<html>
+<body>
+<ul>
+<li>First</li>
+<li>Second</li>
+<li>Third</li>
+<li>Fourth</li>
+</ul>
+</body>
+
+<script type="text/javascript">
+  var els = document.getElementsByTagName('li');
+  [].forEach.call(els, function (e) {
+    e.addEventListener('click', function(e) { alert(e.target.innerText); });
+  });
+</script>
+</html>

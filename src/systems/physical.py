@@ -73,10 +73,10 @@ class Manifold:
     def solve(self):
         a, b, n = self.a, self.b, self.b.pos - self.a.pos
         aextent, bextent = a.pos + Vec(a.w/2, a.h), b.pos + Vec(b.w/2, b.h)
-        xoverlap = aextent.x + bextent.x - abs(n.x)
-        if xoverlap >= 0.0:
-            yoverlap = aextent.y + bextent.y - abs(n.y)
-            if yoverlap >= 0.0:
+        yoverlap = aextent.y + bextent.y - abs(n.y)
+        if yoverlap >= 0.0:
+            xoverlap = aextent.x + bextent.x - abs(n.x)
+            if xoverlap >= 0.0:
                 if xoverlap > yoverlap:
                     self.n = Vec(-1.0, 0.0) if n.x < 0.0 else Vec(1.0, 0.0)
                     self.penetration = xoverlap
