@@ -3,6 +3,7 @@ from collections import namedtuple
 from .system import System
 
 from .. import signaler
+from ..math.vector import Vec
 from ..components.movement import Shape
 from ..components.decoration import Bordered
 
@@ -23,8 +24,13 @@ class ShapeMovementSystem(System):
 
     componenttypes = Shape,
 
-    def setpos(self, newpos, shape):
+    def nocollision(self, newpos, shape):
         shape.pos = newpos
+        # shape.jumping = True
+
+    def collision(self, newpos, shape):
+        if shape.vel.y > 0:
+            shape.jumping = False
 
     def process(self, *args, components, elapsed, **kwargs):
 
@@ -32,9 +38,9 @@ class ShapeMovementSystem(System):
             s.vel += s.acc
             nextpos = s.pos + s.vel * elapsed
 
-            signaler.instance.trigger('no_tile_collision', nextpos, s)
-
-            s.pos = nextpos
+            signaler.instance.trigger('handle_tile_collision',
+                                      nextpos, s, self.nocollision,
+                                      self.collision)
 
             # apply friction to everything
             s.acc *= 0.95
@@ -42,3 +48,26 @@ class ShapeMovementSystem(System):
 
             if s.jumping:
                 s.acc.y += 1.2
+
+    def resolve(self, tile, nextpos, shape, dt):
+        if tile.can_walk:
+            shape.pos = nextpos
+            return
+
+        # the tile we are attempting to enter is unwalkable... back away,
+        # but do so differently depending on entry...?
+
+        dir = direction(nextpos - shape.pos)
+
+        if dir == 'left':
+
+            pass
+        elif dir == 'right':
+            pass
+        elif dir == 'up':
+            pass
+        else:
+            pass
+
+        pen = nextpos - shape.pos
+        shape.pos -= pen

@@ -63,9 +63,6 @@ class PlayerInputSystem(System):
 
     componenttypes = PlayerControlled, Shape
 
-    def init(self):
-        self.initiate_jump = True
-
     def process(self, *args, components, elapsed, **kwargs):
         kp = SDL_GetKeyboardState(None)
 

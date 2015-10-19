@@ -1,5 +1,7 @@
 import math
 
+R = math.cos(math.pi / 4)
+
 
 class Vec:
     '''
@@ -100,6 +102,18 @@ def dot(v1, v2):
 def norm(v):
     return math.sqrt(v.x * v.x + v.y * v.y)
 
+
+def direction(v):
+    rv = Vec(R * v.x + R * v.y, -R * v.x + R * v.y)
+
+    if rv.x >= 0 and rv.y >= 0:
+        return 'down'
+    if rv.x >= 0 and rv.y < 0:
+        return 'right'
+    if rv.x < 0 and rv.y >= 0:
+        return 'left'
+    if rv.x < 0 and rv.y < 0:
+        return 'up'
 
 if __name__ == '__main__':
 
