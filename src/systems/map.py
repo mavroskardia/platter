@@ -24,8 +24,12 @@ class MapSystem(System):
         self.offset = Vec(0, 0)
         self.set_renderer()
         self.init_map()
+        signaler.instance.register('get:map', self.get_map)
         signaler.instance.register('handle_tile_collision', self.check_collide)
         signaler.instance.register('get:tile_at', self.get_tile_at_cb)
+
+    def get_map(self, cb):
+        cb(self)
 
     def check_collide(self, nextpos, shape, cb, nocb):
         x, y = nextpos.x, nextpos.y

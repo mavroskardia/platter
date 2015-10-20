@@ -3,6 +3,7 @@ from collections import OrderedDict
 from sdl2.sdlimage import IMG_Load
 
 from .. import signaler
+from .. import config
 
 
 class TileData:
@@ -19,15 +20,17 @@ class TilesetLoader:
 
     def load(self, filename):
         tiles = OrderedDict()
-        config = ConfigParser()
-        config.read(filename)
+        cp = ConfigParser()
+        cp.read(filename)
 
-        for tilename in config.sections():
+        for tilename in cp.sections():
             print('loading tile', tilename)
-            data = config[tilename]
+            data = cp[tilename]
             can_walk = data['walk'].lower() == 'true'
 
             def add(tex, w, h):
+                assert w == config.tile_width, 'Tile width did not match'
+                assert h == config.tile_height, 'Tile height did not match'
                 tiles[tilename] = TileData(tilename, tex, can_walk)
 
             imgfile = data['file'].encode()

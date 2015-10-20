@@ -17,12 +17,7 @@ class Shape(Component):
 
     @property
     def direction(self):
-        '''
-            Returns one of 'left', 'right', 'down', or 'up'
-        '''
-        # we'll start by rotating the movement vector by π/4 so the rest is
-        # easy peasy
-        return direction(self.vel)
+        return 'left' if self.vel.x < 0 else 'right'  #: direction(self.vel)
 
     @property
     def moving(self):

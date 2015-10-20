@@ -104,6 +104,12 @@ def norm(v):
 
 
 def direction(v):
+    '''
+        Returns one of 'left', 'right', 'down', or 'up'
+    '''
+    # we'll start by rotating the movement vector by π/4 so the rest is
+    # easy peasy
+
     rv = Vec(R * v.x + R * v.y, -R * v.x + R * v.y)
 
     if rv.x >= 0 and rv.y >= 0:
