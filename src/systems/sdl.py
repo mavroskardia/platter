@@ -41,13 +41,12 @@ class SdlSystem(System):
 
         self.middle = Vec(config.resolution[0] / 2, config.resolution[1] / 2)
         self.offset = Vec(0, 0)
-
         self.register_events()
 
     def process(self, *args, entities=None, elapsed=0, **kargs):
-        SDL_RenderPresent(self.renderer)
         SDL_SetRenderDrawColor(self.renderer, 0, 0, 0, 255)
         SDL_RenderClear(self.renderer)
+        SDL_RenderPresent(self.renderer)
         SDL_Delay(5)
 
     def translate(self, x, y):

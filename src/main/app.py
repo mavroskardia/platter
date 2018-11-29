@@ -2,7 +2,8 @@ import sys
 import os
 
 try:
-    os.environ['PYSDL2_DLL_PATH'] = 'lib'
+    if sys.platform == 'win32':
+        os.environ['PYSDL2_DLL_PATH'] = 'lib'
     from sdl2 import *
     from sdl2.sdlttf import *
 except ImportError:

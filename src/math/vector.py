@@ -1,4 +1,5 @@
 import math
+import random
 
 R = math.cos(math.pi / 4)
 
@@ -8,9 +9,19 @@ class Vec:
         In keeping with tradition, a re-implementation of the wheel... i mean,
         2d vector.
     '''
+
+    HashStart = random.randint(1, 123489712983723)
+
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+    def __hash__(self):
+        h = self.HashStart
+        return (h * self.x % 2 ) + (h * self.y % 2)
+
+    def __eq__(self, v):
+        return self.x == v.x and self.y == v.y
 
     def __add__(self, v):
         return Vec(self.x + v.x, self.y + v.y)
@@ -69,9 +80,6 @@ class Vec:
     def __neg__(self):
         return Vec(-self.x, -self.y)
 
-    def __eq__(self, v):
-        return self.x == v.x and self.y == v.y
-
     def __str__(self):
         return '<{s.x}, {s.y}>'.format(s=self)
 
@@ -93,6 +101,12 @@ class Vec:
 
     def perpendicular(self):
         return Vec(-self.y, self.x)
+
+    def overlaps(self, v, threshold=10):
+        return (self.x - threshold <= v.x and
+                self.x + threshold >= v.x and
+                self.y - threshold <= v.y and
+                self.y + threshold >= v.y)
 
 
 def dot(v1, v2):
@@ -145,3 +159,6 @@ if __name__ == '__main__':
     v2n = v2.normalize()
 
     assert v2n == Vec(0.5546986577679576, 0.8320479866519364), v2n
+
+    assert Vec(20,20).overlaps(Vec(25,25), 10)
+    assert not Vec(20,20).overlaps(Vec(25,25), 1)
