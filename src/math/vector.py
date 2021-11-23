@@ -12,7 +12,7 @@ class Vec:
 
     HashStart = random.randint(1, 123489712983723)
 
-    def __init__(self, x, y):
+    def __init__(self, x:float=0.0, y:float=0.0):
         self.x = x
         self.y = y
 

@@ -48,4 +48,5 @@ class SpriteSystem(System):
         sprite.interval = 1.0 / sprite.maxframes
 
         self.spritesets[spriteset] = ss
+        
         return ss

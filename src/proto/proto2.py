@@ -3,7 +3,7 @@ import os
 import random
 
 try:
-    os.environ['PYSDL2_DLL_PATH'] = 'lib'
+    # os.environ['PYSDL2_DLL_PATH'] = 'lib'
     from sdl2 import *
     from sdl2.sdlttf import *
 except ImportError:

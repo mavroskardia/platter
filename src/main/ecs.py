@@ -81,8 +81,12 @@ class EntityComponentSystemManager:
     def process(self, elapsed):
         for componenttypes in self.systemdb:
             for system in self.systemdb[componenttypes]:
+                comps = [
+                    sorted(c, key=lambda c:type(c).__name__)
+                    for c in self.componentdb[system.componenttypes]
+                ]
                 system.process(signaler=self.signaler,
-                               components=self.componentdb[componenttypes],
+                               components=comps,
                                elapsed=elapsed)
 
         self.process_deferrals()

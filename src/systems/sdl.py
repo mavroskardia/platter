@@ -44,10 +44,10 @@ class SdlSystem(System):
         self.register_events()
 
     def process(self, *args, entities=None, elapsed=0, **kargs):
-        SDL_SetRenderDrawColor(self.renderer, 0, 0, 0, 255)
-        SDL_RenderClear(self.renderer)
         SDL_RenderPresent(self.renderer)
-        SDL_Delay(5)
+        SDL_Delay(17)
+        SDL_SetRenderDrawColor(self.renderer, 0, 0, 0, 255)
+        SDL_RenderClear(self.renderer)        
 
     def translate(self, x, y):
         return int(x + self.offset.x), int(y + self.offset.y)
@@ -57,6 +57,7 @@ class SdlSystem(System):
         s.register('get_renderer', self.get_renderer)
         s.register('draw:rect', self.draw_rect)
         s.register('draw:line', self.draw_line)
+        s.register('draw:arrow', self.draw_arrow)
         s.register('draw:filledrect', self.draw_filled_rect)
         s.register('draw:texture', self.draw_texture)
         s.register('draw:text', self.draw_text)
@@ -102,10 +103,23 @@ class SdlSystem(System):
         SDL_SetRenderDrawColor(self.renderer, *c)
         SDL_RenderDrawLine(self.renderer, x1, y1, x2, y2)
 
+    def draw_arrow(self, x1, y1, x2, y2, *args, **kwargs):
+        w, h = kwargs.pop('w', 5), kwargs.pop('h', 5)
+        b = Vec(x2, y2)
+        u = (b - Vec(x1,y1)).normalize()
+        v = u.perpendicular()
+        v1 = b - (h*u) + (w*v)
+        v2 = b - (h*u) - (w*v)
+
+        self.draw_line(x1, y1, x2, y2, *args, **kwargs)
+        self.draw_line(x2, y2, v1.x, v1.y, *args, **kwargs)
+        self.draw_line(x2, y2, v2.x, v2.y, *args, **kwargs)
+
     def draw_filled_rect(self, rect, *args, **kwargs):
         x, y = self.translate(rect.x, rect.y)
+        c = kwargs.pop('color', (255, 255, 255, 50))
         r = SDL_Rect(x, y, int(rect.w), int(rect.h))
-        SDL_SetRenderDrawColor(self.renderer, 255, 255, 255, 255)
+        SDL_SetRenderDrawColor(self.renderer, *c)
         SDL_RenderFillRect(self.renderer, r)
 
     def convert_surface_to_texture(self, surface, callback, *args):

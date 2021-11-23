@@ -1,14 +1,10 @@
 import sys
-import os
 
 try:
-    if sys.platform == 'win32':
-        os.environ['PYSDL2_DLL_PATH'] = 'lib'
     from sdl2 import *
     from sdl2.sdlttf import *
 except ImportError:
-    print('You have to have pysdl2 installed and'
-          ' the sdl2 dlls in the lib directory')
+    print('You have to have pysdl2 installed and pysdl2-dll')
     sys.exit(1)
 
 from .fps import Fps
@@ -51,8 +47,6 @@ class TitleApp:
             SDL_SetRenderDrawColor(self.renderer, 0, 0, 0, 255)
             SDL_RenderClear(self.renderer)
 
-        return False
-
 
 class App:
 
@@ -64,13 +58,11 @@ class App:
 
         self.register_global_events()
         self.fps.init()
-
         self.ecs.init_systems()
+        self.ecs.init_entities()
 
         if not TitleApp().run():
             return
-
-        self.ecs.init_entities()
 
         self.running = True
 
@@ -92,7 +84,8 @@ class App:
         self.running = False
 
     def debug(self):
-        print('FPS:', self.fps)
+        print('FPS:', self.fps.fps)
+        print('Registered triggers:', signaler.instance.events)
         # import pdb
         # pdb.set_trace()
 
