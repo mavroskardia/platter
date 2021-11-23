@@ -99,6 +99,11 @@ class InputHandlerSystem(System):
     signaler.instance.register('keyup:Up', self.handle_keyup('Up'))
     signaler.instance.register('keyup:Down', self.handle_keyup('Down'))
 
+    signaler.instance.register('keydown:D', self.toggle_debug)
+
+  def toggle_debug(self):
+    signaler.instance.trigger('toggle:debugging')
+
   def handle_keydown(self, which):
     def handle():
       self.keysdown[which] = True
@@ -141,11 +146,20 @@ def proto():
     Movement(),
   ])
 
+  vector_renderer_system = MovementPositionVectorRenderSystem()
   ecs = EntityComponentSystemManager()
   fps = Fps()
   fps.init()
 
+  def toggle_debugging():
+    if ecs.has_system(vector_renderer_system):
+      ecs.remove_system(vector_renderer_system)
+    else:
+      ecs.add_system(vector_renderer_system)
+
   signaler.instance.register('quit', quit)
+  signaler.instance.register('keydown:Escape', quit)
+  signaler.instance.register('toggle:debugging', toggle_debugging)
 
   ecs.add_system(SdlSystem(), init=True)
   ecs.add_system(InputSystem(), init=True)
@@ -153,8 +167,7 @@ def proto():
   ecs.add_system(ShapeRenderer())
   ecs.add_system(FrictionSystem())
   ecs.add_system(ImpulseSystem())
-  ecs.add_system(MovementPositionVectorRenderSystem())
-
+  ecs.add_system(vector_renderer_system)
 
   ecs.add_entity(theshape)
 
