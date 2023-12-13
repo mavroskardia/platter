@@ -1,11 +1,8 @@
-import math
-
 from .component import Component
-from ..math.vector import Vec, direction
+from ..math.vector import Vec  # , direction
 
 
 class Shape(Component):
-
     def __init__(self, entity):
         super().__init__(entity)
         self.pos = Vec(0, 0)
@@ -17,7 +14,7 @@ class Shape(Component):
 
     @property
     def direction(self):
-        return 'left' if self.vel.x < 0 else 'right'  #: direction(self.vel)
+        return "left" if self.vel.x < 0 else "right"  #: direction(self.vel)
 
     @property
     def moving(self):

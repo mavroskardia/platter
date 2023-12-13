@@ -67,7 +67,7 @@ class MapSystem(System):
             self.layers['base'] = MapLoader().load(self.map_file, self.tileset)
         else:
             self.layers['base'] = [self.tileset['base']
-                                   for t in
+                                   for _ in
                                    range(self.map_width * self.map_height)]
 
         print('made base layer with {} tiles'.format(len(self.layers['base'])))

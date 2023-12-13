@@ -1,19 +1,18 @@
 import math
 
 from copy import copy
-from itertools import combinations
 
 from .system import System
 
 from .. import config
-from ..math.vector import Vec, dot, norm
-from ..components.physical import (Body, CanCollide, HasPhysics)
+from ..math.vector import Vec, dot
+from ..components.physical import Body, CanCollide, HasPhysics
 
 
 class GravitySystem(System):
-    '''
-        Applies gravity to bodies susceptible to gravity
-    '''
+    """
+    Applies gravity to bodies susceptible to gravity
+    """
 
     componenttypes = Body, HasPhysics
 
@@ -28,23 +27,22 @@ class GravitySystem(System):
 
 
 class ForceSystem(System):
-    '''
-        Applies other forces to bodies
-    '''
+    """
+    Applies other forces to bodies
+    """
 
-    componenttypes = Body,
+    componenttypes = (Body,)
 
     air_friction = Vec(config.air_friction_x, config.air_friction_y)
 
     def process(self, *args, components, elapsed, **kwargs):
         return
-        for body, in components:
+        for (body,) in components:
             # body.vel += body.acc
             body.vel *= self.air_friction
 
 
 class Manifold:
-
     g = Vec(0, 10.0)
     epsilon = 0.0001
     smoothing = 0.7
@@ -72,7 +70,7 @@ class Manifold:
 
     def solve(self):
         a, b, n = self.a, self.b, self.b.pos - self.a.pos
-        aextent, bextent = a.pos + Vec(a.w/2, a.h), b.pos + Vec(b.w/2, b.h)
+        aextent, bextent = a.pos + Vec(a.w / 2, a.h), b.pos + Vec(b.w / 2, b.h)
         yoverlap = aextent.y + bextent.y - abs(n.y)
         if yoverlap >= 0.0:
             xoverlap = aextent.x + bextent.x - abs(n.x)
@@ -96,7 +94,7 @@ class Manifold:
             return  # moving away from each other
 
         j = -(1.0 + self.e) * vn
-        j /= (a.im + b.im)
+        j /= a.im + b.im
 
         a.apply_impulse(-j * self.n)
         b.apply_impulse(j * self.n)
@@ -106,7 +104,7 @@ class Manifold:
             t.normalize()
 
         jt = -dot(r, t)
-        jt /= (a.im + b.im)
+        jt /= a.im + b.im
 
         ajt = abs(jt)
 
@@ -146,7 +144,6 @@ class Manifold:
 
 
 class PhysicsSystem(System):
-
     componenttypes = Body, CanCollide, HasPhysics
 
     gravity = Vec(0, config.gravity)
@@ -183,6 +180,7 @@ class PhysicsSystem(System):
                 body.vel.y = max(-200, min(200, body.vel.y))
 
     def resolve_collisions(self):
+        iterations = 1
         for i in range(iterations):
             for c in self.contacts:
                 c.resolve()
@@ -204,29 +202,32 @@ class PhysicsSystem(System):
 
 
 class CollisionDetectionSystem0(System):
-
     componenttypes = Body, CanCollide
 
     def process(self, *args, components, elapsed, **kwargs):
-
         if len(components) < 2:
             return
 
         for body, _ in components:
             for otherbody, __ in components:
-
                 if body == otherbody:
                     continue
 
-                b1 = Body(body.entity,
-                          x=body.pos.x + body.vel.x * elapsed,
-                          y=body.pos.y + body.vel.y * elapsed,
-                          w=body.w, h=body.h)
+                b1 = Body(
+                    body.entity,
+                    x=body.pos.x + body.vel.x * elapsed,
+                    y=body.pos.y + body.vel.y * elapsed,
+                    w=body.w,
+                    h=body.h,
+                )
 
-                b2 = Body(body.entity,
-                          x=otherbody.pos.x + otherbody.vel.x * elapsed,
-                          y=otherbody.pos.y + otherbody.vel.y * elapsed,
-                          w=otherbody.w, h=otherbody.h)
+                b2 = Body(
+                    body.entity,
+                    x=otherbody.pos.x + otherbody.vel.x * elapsed,
+                    y=otherbody.pos.y + otherbody.vel.y * elapsed,
+                    w=otherbody.w,
+                    h=otherbody.h,
+                )
 
                 if self.arecolliding(b1, b2):
                     # body.vel = copy(otherbody.vel)
@@ -240,20 +241,22 @@ class CollisionDetectionSystem0(System):
                         pass
 
     def arecolliding(self, b1, b2):
-        return (b1.pos.x < b2.pos.x + b2.w and
-                b1.pos.x + b1.w > b2.pos.x and
-                b1.pos.y < b2.pos.y + b2.h and
-                b1.pos.y + b1.h > b2.pos.y)
+        return (
+            b1.pos.x < b2.pos.x + b2.w
+            and b1.pos.x + b1.w > b2.pos.x
+            and b1.pos.y < b2.pos.y + b2.h
+            and b1.pos.y + b1.h > b2.pos.y
+        )
 
 
 class PositionUpdateSystem(System):
-    '''
-        After everything is done applying its effects to Velocity,
-        update the position by the velocity
-    '''
+    """
+    After everything is done applying its effects to Velocity,
+    update the position by the velocity
+    """
 
-    componenttypes = Body,
+    componenttypes = (Body,)
 
     def process(s, *args, components=None, elapsed=0, **kargs):
-        for body, in components:
+        for (body,) in components:
             body.pos += body.vel * elapsed

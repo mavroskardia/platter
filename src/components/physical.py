@@ -1,5 +1,4 @@
-from copy import copy
-from collections import deque, namedtuple
+from collections import namedtuple
 
 from ..math.vector import Vec
 from .component import Component
@@ -17,28 +16,27 @@ class CanCollide(Component):
 
 
 class Body(Component):
-
-    Rect = namedtuple('Rect', ('x', 'y', 'w', 'h'))
+    Rect = namedtuple("Rect", ("x", "y", "w", "h"))
 
     def __init__(self, entity, *args, **kwargs):
         super().__init__(entity, *args, **kwargs)
 
         # top-left position
-        self.pos = Vec(kwargs.pop('x', 0.0), kwargs.pop('y', 0.0))
+        self.pos = Vec(kwargs.pop("x", 0.0), kwargs.pop("y", 0.0))
         # dimensions
-        self.w, self.h = kwargs.pop('w', 10), kwargs.pop('h', 10)
+        self.w, self.h = kwargs.pop("w", 10), kwargs.pop("h", 10)
         # velocity
-        self.vel = Vec(kwargs.pop('vx', 0.0), kwargs.pop('vy', 0.0))
+        self.vel = Vec(kwargs.pop("vx", 0.0), kwargs.pop("vy", 0.0))
 
         # frictions
-        self.static_friction = kwargs.pop('sf', 0.2)
-        self.dynamic_friction = kwargs.pop('df', 20.1)
+        self.static_friction = kwargs.pop("sf", 0.2)
+        self.dynamic_friction = kwargs.pop("df", 20.1)
 
         # restitution
-        self.restitution = kwargs.pop('r', 0.1)
+        self.restitution = kwargs.pop("r", 0.1)
 
         # inverse mass
-        mass = kwargs.pop('mass', 1.0)
+        mass = kwargs.pop("mass", 1.0)
         self.im = 0 if mass == 0 else 1 / mass
 
         # calculation vars
@@ -71,18 +69,22 @@ class Body(Component):
         self.max = self.pos + Vec(self.w, self.h)
 
     def is_overlapping(self, other):
-        return (self.pos.x < other.pos.x + other.w and
-                self.pos.x + self.w > other.pos.x and
-                self.pos.y < other.pos.y + other.h and
-                self.pos.y + self.h > other.pos.y)
+        return (
+            self.pos.x < other.pos.x + other.w
+            and self.pos.x + self.w > other.pos.x
+            and self.pos.y < other.pos.y + other.h
+            and self.pos.y + self.h > other.pos.y
+        )
 
     def __str__(self):
-        return '''Body for {s.entity.name}:
+        return """Body for {s.entity.name}:
     Position:       {s.pos}
     Dimensions:     {s.w} x {s.h}
     Velocity:       {s.vel}
     Acceleration:   {s.acc}
-'''.format(s=self)
+""".format(
+            s=self
+        )
 
     @property
     def moving(self):
@@ -94,14 +96,14 @@ class Body(Component):
     @property
     def direction(self):
         if self.vel.x > 0:
-            return 'right'
+            return "right"
         else:
-            return 'left'
+            return "left"
 
         if self.vel.y < 0:
-            return 'up'
+            return "up"
         elif self.vel.y > 0:
-            return 'down'
+            return "down"
 
     def as_rect(self):
         return Body.Rect(self.pos.x, self.pos.y, self.w, self.h)

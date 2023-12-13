@@ -1,10 +1,26 @@
 import sys
 
 try:
-    from sdl2 import *
-    from sdl2.sdlttf import *
+    from sdl2 import (
+        SDL_Color,
+        SDL_CreateTextureFromSurface,
+        SDL_Rect,
+        SDL_Event,
+        SDL_PollEvent,
+        SDL_QUIT,
+        SDL_KEYDOWN,
+        SDL_SCANCODE_RETURN,
+        SDL_RenderClear,
+        SDL_RenderCopy,
+        SDL_RenderPresent,
+        SDL_SetRenderDrawColor,
+    )
+    from sdl2.sdlttf import (
+        TTF_OpenFont,
+        TTF_RenderUTF8_Blended,
+    )
 except ImportError:
-    print('You have to have pysdl2 installed and pysdl2-dll')
+    print("You have to have pysdl2 installed and pysdl2-dll")
     sys.exit(1)
 
 from .fps import Fps
@@ -15,25 +31,23 @@ from .. import config
 
 
 class TitleApp:
-
     def __init__(self):
         def set_renderer(renderer):
             self.renderer = renderer
 
-        signaler.instance.trigger('get_renderer', set_renderer)
+        signaler.instance.trigger("get_renderer", set_renderer)
 
     def run(self):
-
         font = TTF_OpenFont(config.title_font.encode(), config.title_font_size)
 
-        ts = TTF_RenderUTF8_Blended(font, 'Platterman'.encode(),
-                                    SDL_Color(255, 255, 255, 255))
+        ts = TTF_RenderUTF8_Blended(
+            font, "Platterman".encode(), SDL_Color(255, 255, 255, 255)
+        )
 
         title = SDL_CreateTextureFromSurface(self.renderer, ts)
         title_rect = SDL_Rect(100, 100, ts.contents.w, ts.contents.h)
 
         while True:
-
             evt = SDL_Event()
             while SDL_PollEvent(evt):
                 if evt.type == SDL_QUIT:
@@ -49,13 +63,11 @@ class TitleApp:
 
 
 class App:
-
     def __init__(self):
         self.ecs = EntityComponentSystemManager()
         self.fps = Fps()
 
     def run(self):
-
         self.register_global_events()
         self.fps.init()
         self.ecs.init_systems()
@@ -73,39 +85,39 @@ class App:
 
     def register_global_events(self):
         s = signaler.instance
-        s.register('add_entity', self.ecs.add_entity)
-        s.register('quit', self.quit)
-        s.register('keydown:Escape', self.quit)
-        s.register('keydown:D', self.debug)
-        s.register('remove_component', self.ecs.remove_component)
-        s.register('add_component', self.ecs.add_component)
+        s.register("add_entity", self.ecs.add_entity)
+        s.register("quit", self.quit)
+        s.register("keydown:Escape", self.quit)
+        s.register("keydown:D", self.debug)
+        s.register("remove_component", self.ecs.remove_component)
+        s.register("add_component", self.ecs.add_component)
 
     def quit(self):
         self.running = False
 
     def debug(self):
-        print('FPS:', self.fps.fps)
-        print('Registered triggers:', signaler.instance.events)
+        print("FPS:", self.fps.fps)
+        print("Registered triggers:", signaler.instance.events)
         # import pdb
         # pdb.set_trace()
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     if len(sys.argv) == 1:
         App().run()
-    elif sys.argv[1] == 'profile':
+    elif sys.argv[1] == "profile":
         import cProfile
-        import io
         import pstats
+
         profile = cProfile.Profile()
         profile.enable()
         try:
             App().run()
-        except:
-            pass
+        except Exception as e:
+            print("ERROR:", e)
+            sys.exit(1)
         profile.disable()
-        sortby = 'cumulative'
-        with open('profile.log', 'w') as f:
+        sortby = "cumulative"
+        with open("profile.log", "w") as f:
             ps = pstats.Stats(profile, stream=f).sort_stats(sortby)
             ps.print_stats()

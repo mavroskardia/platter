@@ -5,20 +5,20 @@ R = math.cos(math.pi / 4)
 
 
 class Vec:
-    '''
-        In keeping with tradition, a re-implementation of the wheel... i mean,
-        2d vector.
-    '''
+    """
+    In keeping with tradition, a re-implementation of the wheel... i mean,
+    2d vector.
+    """
 
     HashStart = random.randint(1, 123489712983723)
 
-    def __init__(self, x:float=0.0, y:float=0.0):
+    def __init__(self, x: float = 0.0, y: float = 0.0):
         self.x = x
         self.y = y
 
     def __hash__(self):
         h = self.HashStart
-        return (h * self.x % 2 ) + (h * self.y % 2)
+        return (h * self.x % 2) + (h * self.y % 2)
 
     def __eq__(self, v):
         return self.x == v.x and self.y == v.y
@@ -81,10 +81,10 @@ class Vec:
         return Vec(-self.x, -self.y)
 
     def __str__(self):
-        return '<{s.x}, {s.y}>'.format(s=self)
+        return "<{s.x}, {s.y}>".format(s=self)
 
     def __repr__(self):
-        return 'Vector: <{s.x}, {s.y}>'.format(s=self)
+        return "Vector: <{s.x}, {s.y}>".format(s=self)
 
     def __copy__(self):
         return Vec(self.x, self.y)
@@ -103,10 +103,12 @@ class Vec:
         return Vec(-self.y, self.x)
 
     def overlaps(self, v, threshold=10):
-        return (self.x - threshold <= v.x and
-                self.x + threshold >= v.x and
-                self.y - threshold <= v.y and
-                self.y + threshold >= v.y)
+        return (
+            self.x - threshold <= v.x
+            and self.x + threshold >= v.x
+            and self.y - threshold <= v.y
+            and self.y + threshold >= v.y
+        )
 
 
 def dot(v1, v2):
@@ -118,25 +120,25 @@ def norm(v):
 
 
 def direction(v):
-    '''
-        Returns one of 'left', 'right', 'down', or 'up'
-    '''
+    """
+    Returns one of 'left', 'right', 'down', or 'up'
+    """
     # we'll start by rotating the movement vector by π/4 so the rest is
     # easy peasy
 
     rv = Vec(R * v.x + R * v.y, -R * v.x + R * v.y)
 
     if rv.x >= 0 and rv.y >= 0:
-        return 'down'
+        return "down"
     if rv.x >= 0 and rv.y < 0:
-        return 'right'
+        return "right"
     if rv.x < 0 and rv.y >= 0:
-        return 'left'
+        return "left"
     if rv.x < 0 and rv.y < 0:
-        return 'up'
+        return "up"
 
-if __name__ == '__main__':
 
+if __name__ == "__main__":
     v0 = Vec(0, 0)
     v1 = Vec(4, 5)
     v2 = Vec(2, 3)
@@ -160,5 +162,5 @@ if __name__ == '__main__':
 
     assert v2n == Vec(0.5546986577679576, 0.8320479866519364), v2n
 
-    assert Vec(20,20).overlaps(Vec(25,25), 10)
-    assert not Vec(20,20).overlaps(Vec(25,25), 1)
+    assert Vec(20, 20).overlaps(Vec(25, 25), 10)
+    assert not Vec(20, 20).overlaps(Vec(25, 25), 1)

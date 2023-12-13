@@ -1,4 +1,5 @@
 import atexit
+import ctypes
 
 from sdl2 import *
 from sdl2.sdlttf import *
@@ -11,6 +12,9 @@ from ..math.vector import Vec
 
 class SdlSystem(System):
 
+    def __init__(self, title=None):
+        self.title = config.title.encode() if not title else title.encode()
+
     def init(self):
         atexit.register(SDL_Quit)
 
@@ -22,7 +26,7 @@ class SdlSystem(System):
         if err != 0:
             raise Exception(TTF_GetError())
 
-        self.window = SDL_CreateWindow(config.title.encode(),
+        self.window = SDL_CreateWindow(self.title,
                                        SDL_WINDOWPOS_CENTERED,
                                        SDL_WINDOWPOS_CENTERED,
                                        config.resolution[0],
@@ -45,9 +49,9 @@ class SdlSystem(System):
 
     def process(self, *args, entities=None, elapsed=0, **kargs):
         SDL_RenderPresent(self.renderer)
-        SDL_Delay(17)
+        SDL_Delay(12)
         SDL_SetRenderDrawColor(self.renderer, 0, 0, 0, 255)
-        SDL_RenderClear(self.renderer)        
+        SDL_RenderClear(self.renderer)
 
     def translate(self, x, y):
         return int(x + self.offset.x), int(y + self.offset.y)
@@ -55,6 +59,7 @@ class SdlSystem(System):
     def register_events(self):
         s = signaler.instance
         s.register('get_renderer', self.get_renderer)
+        s.register('get:screen_dimensions', self.get_screen_dimensions)
         s.register('draw:rect', self.draw_rect)
         s.register('draw:line', self.draw_line)
         s.register('draw:arrow', self.draw_arrow)
@@ -84,6 +89,11 @@ class SdlSystem(System):
 
     def get_renderer(self, callback):
         callback(self.renderer)
+
+    def get_screen_dimensions(self, callback):
+        w, h = ctypes.c_int(0), ctypes.c_int(0)
+        SDL_GetWindowSize(self.window, ctypes.byref(w), ctypes.byref(h))
+        callback(w.value, h.value)
 
     def draw_texture(self, texture, rect, *args, **kwargs):
         x, y = self.translate(rect.x, rect.y)
