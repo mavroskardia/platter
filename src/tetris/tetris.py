@@ -8,6 +8,7 @@ from ..main.ecs import EntityComponentSystemManager
 from .hud import HudSystem
 from .input import TetrisInputSystem
 from .tetramino_renderer import TetraminoRenderer
+from .game import TetrisUpdateSystem
 
 
 class Tetris:
@@ -37,6 +38,7 @@ class Tetris:
         self.ecs.add_system(InputSystem(), init=True)
         self.ecs.add_system(TetrisInputSystem(), init=True)
         self.ecs.add_system(TetraminoRenderer(), init=True)
+        self.ecs.add_system(TetrisUpdateSystem(), init=True)
         self.ecs.add_system(HudSystem(), init=True)
 
     def register_global_events(self):

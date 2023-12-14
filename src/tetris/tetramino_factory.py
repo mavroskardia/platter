@@ -17,9 +17,13 @@ class Tetraminos(Enum):
 class Tetramino(Component):
     name: str
     shape: list
+    frozen: bool = False
 
-    def rotate(self):
-        self.shape = list(zip(*self.shape[::-1]))
+    def rotate(self, dir=1):
+        if dir > 0:
+            self.shape = list(zip(*self.shape[::-1]))
+        elif dir < 0:
+            self.shape = list(reversed(list(zip(*self.shape))))
 
 
 class TetraminoFactory:
@@ -51,16 +55,16 @@ class TetraminoFactory:
             case Tetraminos.LR:
                 rettet.name = 'LR'
                 rettet.shape = [
+                    (0, 0, 0, 0),
+                    (0, 1, 0, 0),
+                    (0, 1, 0, 0),
                     (1, 1, 0, 0),
-                    (0, 1, 1, 0),
-                    (0, 0, 0, 0),
-                    (0, 0, 0, 0),
                 ]
             case Tetraminos.Z:
                 rettet.name = 'Z'
                 rettet.shape = [
-                    (1, 1, 0, 0),
                     (0, 1, 1, 0),
+                    (1, 1, 0, 0),
                     (0, 0, 0, 0),
                     (0, 0, 0, 0),
                 ]
@@ -76,15 +80,15 @@ class TetraminoFactory:
                 rettet.name = 'Square'
                 rettet.shape = [
                     (1, 1, 0, 0),
-                    (0, 1, 1, 0),
+                    (1, 1, 0, 0),
                     (0, 0, 0, 0),
                     (0, 0, 0, 0),
                 ]
             case Tetraminos.T:
                 rettet.name = 'T'
                 rettet.shape = [
-                    (1, 1, 0, 0),
-                    (0, 1, 1, 0),
+                    (1, 1, 1, 0),
+                    (0, 1, 0, 0),
                     (0, 0, 0, 0),
                     (0, 0, 0, 0),
                 ]

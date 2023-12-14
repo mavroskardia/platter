@@ -1,10 +1,11 @@
 from dataclasses import dataclass
+from typing import Hashable
 from ..signaler import instance as signaler
 from ..systems.system import System
 
 
 @dataclass
-class Rect:
+class Rect(Hashable):
     x: int
     y: int
     w: int

@@ -6,3 +6,11 @@ from ...components.component import Component
 class Position(Component):
     x: int
     y: int
+
+
+@dataclass
+class Shape(Component):
+    x: int
+    y: int
+    w: int
+    h: int
